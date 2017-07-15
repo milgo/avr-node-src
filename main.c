@@ -1,6 +1,11 @@
-#include "functions.h"
 #include "program.h"
+#include "setup.h"
 
-int main(){
-	loop();
+int main(void)
+{
+	setup();
+    while (1) 
+    {
+        loop();
+    }
 }

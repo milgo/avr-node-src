@@ -1,2 +1,1 @@
-#include "program.h" 
-void loop(){PRT(ADD(PC1(),PC2()));}
+#include "program.h"void loop(){	begin();	ANG(2);	end();}
