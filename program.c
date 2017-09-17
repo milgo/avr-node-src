@@ -1,1 +1,8 @@
-#include "program.h"void loop(){	begin();	ANG(2);	end();}
+#include "program.h"
+
+void loop()
+{
+	begin();
+	I3();	O1(I3());
+	end();
+}

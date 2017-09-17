@@ -7,71 +7,48 @@
 
 #include "setup.h"
 
-#define SET_PIN(P,B,V) if(V==0){P&=~_BV(B);}else{P|=_BV(B);}
-#define GET_PIN(P,B) !(P & _BV(B));
+/*VARDEF*/ #define INT int
+/*VARDEF*/ #define REAL float
+/*VARDEF*/ #define STR const char*
+/*VARDEF*/ #define BOOL unsigned char
 
-#define GET_BIT(A,N)
-#define SET_BIT(A,N)if((N&0x01)==1){markerArray[vn] |= 1 << (num-((num>>3)<<3));}else{markerArray[vn] &= ~(1 << (num-((num>>3)<<3));}
 
-#define SET_PARAM(VAR,VAL) VAR|=VAL
-#define RESET_PARAM(VAR,VAL) VAR&=~VAL
-#define IS_PARAM_SET(VAR, VAL) ((VAR&VAL)==VAL)
+/*FNCDEF*/ void O1(INT v);
+/*FNCDEF*/ void O2(INT v);
+/*FNCDEF*/ void O3(INT v);
+/*FNCDEF*/ void O4(INT v);
+/*FNCDEF*/ void O5(INT v);
 
-/* Multiply this by 8 to get the real num of available variables */
-#define MAX_MARKERS 4
-#define MAX_EDGES 4
+/*FNCDEF*/ INT I1(void);
+/*FNCDEF*/ INT I2(void);
+/*FNCDEF*/ INT I3(void);
+/*FNCDEF*/ INT I4(void);
+/*FNCDEF*/ INT I5(void);
 
-#define MAX_TIMERS 16
-#define MAX_COUNTERS 16
-#define MAX_UINT32 4294967296
+/*FNCDEF*/ void MKS(INT n, INT v);
+/*FNCDEF*/ INT MKG(INT n);
 
-#define TIMER_ON 0x01
-#define TIMER_RESET 0x02
-#define TIMER_ONCE 0x04
-#define TIMER_OVF 0x08
+/*FNCDEF*/ INT FLP(INT num, INT set, INT reset);
+/*FNCDEF*/ INT TMR2(INT num, INT time, INT reset);
+/*FNCDEF*/ INT ANG(INT num);
 
-#define COUNTER_ON 0x01
-#define COUNTER_INC 0x02
-#define COUNTER_RESET 0x04
+/*FNCDEF*/ void SND(INT pulse, INT val);
 
-#define ADC_CHANNELS 6
+/*FNCDEF*/ INT EDG(INT num, INT pulse, INT rise, INT reset);
+/*FNCDEF*/ INT CNT(INT num, INT pulse, INT reset);
 
-	void O1(int v);
-	void O2(int v);
-	void O3(int v);
-	void O4(int v);
-	void O5(int v);
-	
-	int I1(void);
-	int I2(void);
-	int I3(void);
-	int I4(void);
-	int I5(void);
-	
-	void MKS(int n, int v);
-	int MKG(int n);
-	
-	int FLP(int num, int set, int reset);
-	int TMR(int num, int time, int reset);
-	int ANG(int num);
-	
-	void SND(int pulse, int val);
-	
-	int EDG(int num, int pulse, int rise, int reset);
-	int CNT(int num, int pulse, int reset);
-	
-	int CGT(int a, int b);
-	int CLT(int a, int b);
-	int CEQ(int a, int b);
-	
-	int MOD(int a, int b);
-	int SHR(int a, int b);
-	
-	int ADD(int a, int b);
-	
-	int AND(int a, int b);
-	int OR(int a, int b);
-	int NOT(int a);
+/*FNCDEF*/ INT CGT(INT a, INT b);
+/*FNCDEF*/ INT CLT(INT a, INT b);
+/*FNCDEF*/ INT CEQ(INT a, INT b);
+
+/*FNCDEF*/ INT MOD(INT a, INT b);
+/*FNCDEF*/ INT SHR(INT a, INT b);
+
+/*FNCDEF*/ INT ADD(INT a, INT b);
+
+/*FNCDEF*/ INT AND(INT a, INT b);
+/*FNCDEF*/ INT OR(INT a, INT b);
+/*FNCDEF*/ INT NOT(INT a);
 
 
 #endif
