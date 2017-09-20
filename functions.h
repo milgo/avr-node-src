@@ -7,9 +7,11 @@
 
 #include "setup.h"
 
+typedef char String128[129];
+
 /*VARDEF*/ #define INT int
 /*VARDEF*/ #define REAL float
-/*VARDEF*/ #define STR const char*
+/*VARDEF*/ #define STR String128
 /*VARDEF*/ #define BOOL unsigned char
 
 

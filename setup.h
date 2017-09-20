@@ -22,6 +22,7 @@
 #define MAX_TIMERS 16
 #define MAX_COUNTERS 16
 #define MAX_UINT32 4294967296
+#define MAX_VARS 64
 
 #define TIMER_ON 0x01
 #define TIMER_RESET 0x02

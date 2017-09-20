@@ -7,3 +7,5 @@
 *.sym
 *.hex
 .dep
+variables.h
+variables.c
