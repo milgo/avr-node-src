@@ -7,7 +7,7 @@
 
 #include "setup.h"
 
-typedef char String128[129];
+typedef char* String128;
 
 /*VARDEF*/ #define INT int
 /*VARDEF*/ #define REAL float

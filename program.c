@@ -1,8 +1,10 @@
 #include "program.h"
+#include "variables.h"
 
 void loop()
 {
 	begin();
-	I3();	O1(I3());
+	O1(CLT(getINT(NEW),getINT(NEW)));
+	O1(NOT(getINT(NEW3)));
 	end();
 }
