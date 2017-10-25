@@ -4,7 +4,6 @@
 void loop()
 {
 	begin();
-	O1(CLT(getINT(NEW),getINT(NEW)));
-	O1(NOT(getINT(NEW3)));
+	O1(OR(I3(),I4()));
 	end();
 }

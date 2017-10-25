@@ -15,17 +15,17 @@ typedef char* String128;
 /*VARDEF*/ #define BOOL unsigned char
 
 
-/*FNCDEF*/ void O1(INT v);
-/*FNCDEF*/ void O2(INT v);
-/*FNCDEF*/ void O3(INT v);
-/*FNCDEF*/ void O4(INT v);
-/*FNCDEF*/ void O5(INT v);
+/*OUTPUT*/ void O1(INT v);
+/*OUTPUT*/ void O2(INT v);
+/*OUTPUT*/ void O3(INT v);
+/*OUTPUT*/ void O4(INT v);
+/*OUTPUT*/ void O5(INT v);
 
-/*FNCDEF*/ INT I1(void);
-/*FNCDEF*/ INT I2(void);
-/*FNCDEF*/ INT I3(void);
-/*FNCDEF*/ INT I4(void);
-/*FNCDEF*/ INT I5(void);
+/*INPUT*/ INT I1(void);
+/*INPUT*/ INT I2(void);
+/*INPUT*/ INT I3(void);
+/*INPUT*/ INT I4(void);
+/*INPUT*/ INT I5(void);
 
 /*FNCDEF*/ void MKS(INT n, INT v);
 /*FNCDEF*/ INT MKG(INT n);
