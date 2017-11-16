@@ -6,51 +6,52 @@
 #include <avr/interrupt.h>
 
 #include "setup.h"
+#include "max.h"
 
 typedef char* String128;
 
+/*VARDEF*/ #define UINT uint16_t
 /*VARDEF*/ #define INT int
 /*VARDEF*/ #define REAL float
 /*VARDEF*/ #define STR String128
-/*VARDEF*/ #define BOOL unsigned char
+/*VARDEF*/ #define BOOL uint8_t
 
 
-/*OUTPUT*/ void O1(INT v);
-/*OUTPUT*/ void O2(INT v);
-/*OUTPUT*/ void O3(INT v);
-/*OUTPUT*/ void O4(INT v);
-/*OUTPUT*/ void O5(INT v);
+/*OUTPUT*/ void DO1(BOOL out);
+/*OUTPUT*/ void DO2(BOOL out);
+/*OUTPUT*/ void DO3(BOOL out);
+/*OUTPUT*/ void DO4(BOOL out);
+/*OUTPUT*/ void DO5(BOOL out);
 
-/*INPUT*/ INT I1(void);
-/*INPUT*/ INT I2(void);
-/*INPUT*/ INT I3(void);
-/*INPUT*/ INT I4(void);
-/*INPUT*/ INT I5(void);
+/*OUTPUT*/ void AO1(UINT out);
 
-/*FNCDEF*/ void MKS(INT n, INT v);
-/*FNCDEF*/ INT MKG(INT n);
+/*INPUT*/ BOOL DI1(void);
+/*INPUT*/ BOOL DI2(void);
+/*INPUT*/ BOOL DI3(void);
+/*INPUT*/ BOOL DI4(void);
+/*INPUT*/ BOOL DI5(void);
 
-/*FNCDEF*/ INT FLP(INT num, INT set, INT reset);
-/*FNCDEF*/ INT TMR2(INT num, INT time, INT reset);
-/*FNCDEF*/ INT ANG(INT num);
+/*INPUT*/ INT AI1(void);
+/*INPUT*/ INT AI2(void);
+/*INPUT*/ INT AI3(void);
+/*INPUT*/ INT AI4(void);
+/*INPUT*/ INT AI5(void);
+/*INPUT*/ INT AI5(void);
 
-/*FNCDEF*/ void SND(INT pulse, INT val);
+/*FNCDEF,UNIQUE*/ INT FLP(UINT id, BOOL set, BOOL reset);
+/*FNCDEF,UNIQUE*/ INT TMR(UINT id, UINT time, BOOL reset);
+/*FNCDEF,UNIQUE*/ INT EDG(UINT id, BOOL pulse);
+/*FNCDEF,UNIQUE*/ UINT CNT(UINT id, BOOL pulse, BOOL reset);
 
-/*FNCDEF*/ INT EDG(INT num, INT pulse, INT rise, INT reset);
-/*FNCDEF*/ INT CNT(INT num, INT pulse, INT reset);
+/*FNCDEF*/ void SND(BOOL pulse, INT val);
+
 
 /*FNCDEF*/ INT CGT(INT a, INT b);
 /*FNCDEF*/ INT CLT(INT a, INT b);
 /*FNCDEF*/ INT CEQ(INT a, INT b);
-
-/*FNCDEF*/ INT MOD(INT a, INT b);
-/*FNCDEF*/ INT SHR(INT a, INT b);
-
-/*FNCDEF*/ INT ADD(INT a, INT b);
-
-/*FNCDEF*/ INT AND(INT a, INT b);
-/*FNCDEF*/ INT OR(INT a, INT b);
-/*FNCDEF*/ INT NOT(INT a);
+/*FNCDEF*/ BOOL AND(BOOL a, BOOL b);
+/*FNCDEF*/ BOOL OR(BOOL a, BOOL b);
+/*FNCDEF*/ BOOL NOT(BOOL a);
 
 
 #endif
