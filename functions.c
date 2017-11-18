@@ -94,6 +94,10 @@ UINT AI5(){
     return adcResults[4];
 }
 
+UINT UCONST(UINT cnst){
+    return cnst;
+}
+
 BOOL TMR(UINT id, UINT time, BOOL reset)
 {
         if(!IS_PARAM_SET(TMR_FUNC_DATA[id],TIMER_ON))
@@ -105,10 +109,10 @@ BOOL TMR(UINT id, UINT time, BOOL reset)
         {
                 if((reset & 0x01) == 1)
                 {
-                        TMR_FUNC_VALUE[id]=time;
+                    TMR_FUNC_VALUE[id]=time;
 		}
 
-                if(TMR_FUNC_VALUE[id] == 0)
+                if(TMR_FUNC_VALUE[id] <= 0)
                 {
                     TMR_FUNC_VALUE[id] = time;
                     return 1;
