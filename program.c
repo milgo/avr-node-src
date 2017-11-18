@@ -4,6 +4,7 @@
 void loop()
 {
 	begin();
-	FLP(2,FLP(0,FLP(1,AND(I3(),I4()),getINT(NEWINT)),I1()),I5());
+	setBOOL(DIGITALINPUT01, DI3());
+	DO1(getBOOL(DIGITALINPUT01));
 	end();
 }

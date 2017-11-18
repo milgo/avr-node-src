@@ -1,127 +1,100 @@
 #include "functions.h"
 #include "program.h"
 
-volatile uint8_t timerArray[MAX_TIMERS];
-volatile uint32_t timerValueArray[MAX_TIMERS];
-uint32_t timerTimeArray[MAX_TIMERS];
+volatile UINT adcResults[ADC_CHANNELS];
+volatile UINT adcIsrChnl=0;
+volatile UINT real_time=0;
 
-uint32_t counterValueArray[MAX_COUNTERS];
-uint8_t counterArray[MAX_COUNTERS];
+UINT CNT_FUNC_DATA[MAX_FUNC_CNT];
+BOOL FALL_FUNC_DATA[MAX_FUNC_FALL];
+BOOL RISE_FUNC_DATA[MAX_FUNC_RISE];
+BOOL FLIP_FUNC_DATA[MAX_FUNC_FLIP];
+volatile UINT TMR_FUNC_DATA[MAX_FUNC_TMR];
+volatile UINT TMR_FUNC_VALUE[MAX_FUNC_TMR];
 
-
-volatile uint16_t adcResults[ADC_CHANNELS];
-volatile int adcIsrChnl=0;
-
-volatile uint16_t real_time=0;
 void begin()
 {
-	int i;
-        for(i=0; i<MAX_TIMERS; i++)
-        {
-                if(IS_PARAM_SET(TMR_FUNC_DATA[i], TIMER_ON) && TMR_FUNC_VALUE[i]<=0)
-                {
-                        SET_PARAM(TMR_FUNC_DATA[i], TIMER_OVF); /*SIGNAL TIMER OVERFLOW*/
-                        TMR_FUNC_VALUE[i]=TMR_FUNC_TIME[i];
-			real_time=0;
-		}
-	}
+
 }
 
 void end()
 {
-        UINT i;
-        for(i=0; i<MAX_FUNC_TMR; i++)
-        {
-                RESET_PARAM(TMR_FUNC_DATA[i], TIMER_OVF);
-        }
+
 }
 
 void init(){
 	int i;
-	for(i=0; i<MAX_MARKERS; i++){
-		markerArray[i]=0;
-	}
-	for(i=0; i<MAX_TIMERS; i++){
-		timerArray[i]=0;
-		timerValueArray[i]=0;
-		timerTimeArray[i]=0;
-	}
-	for(i=0; i<MAX_COUNTERS; i++){
-		counterArray[i]=0;
-		counterValueArray[i]=0;
-	}
-	for(i=0; i<MAX_EDGES; i++){
-		edgeArray[i]=0;
-	}	
+        for(i=0; i<MAX_FUNC_CNT; i++)CNT_FUNC_DATA[i]=0;
+        for(i=0; i<MAX_FUNC_FALL; i++)FALL_FUNC_DATA[i]=0;
+        for(i=0; i<MAX_COUNTERS; i++)CNT_FUNC_DATA[i]=0;
+        for(i=0; i<MAX_FUNC_RISE; i++)RISE_FUNC_DATA[i]=0;
+        for(i=0; i<MAX_FUNC_TMR; i++){
+            TMR_FUNC_DATA[i]=0;
+            TMR_FUNC_VALUE[i]=0;
+        }
 }
 
-void DO1(int v){
-	SET_PIN(PORTD, 5, v)
+void DO1(BOOL out){
+        SET_PIN(PORTD, 5, out)
 }
 
-void DO2(int v){
-	SET_PIN(PORTD, 6, v)
+void DO2(BOOL out){
+        SET_PIN(PORTD, 6, out)
 }
 
-void DO3(int v){
-	SET_PIN(PORTD, 7, v)
+void DO3(BOOL out){
+        SET_PIN(PORTD, 7, out)
 }
 
-void DO4(int v){
-	SET_PIN(PORTB, 0, v)
+void DO4(BOOL out){
+        SET_PIN(PORTB, 0, out)
 }
 
-void DO5(int v){
-	SET_PIN(PORTB, 1, v)
+void DO5(BOOL out){
+        SET_PIN(PORTB, 1, out)
 }
 
-int DI1(){
+BOOL DI1(){
 	return GET_PIN(PIND, 0);
 }
 	
-int DI2(){
+BOOL DI2(){
 	return GET_PIN(PIND, 1);
 }
 	
-int DI3(){
+BOOL DI3(){
 	return GET_PIN(PIND, 2);
 }
 
-int DI4(){
+BOOL DI4(){
 	return GET_PIN(PIND, 3);
 }
 
-int DI5(){
+BOOL DI5(){
 	return GET_PIN(PIND, 4);
 }
 
-int AI1(){
+UINT AI1(){
     return adcResults[0];
 }
 
-int AI2(){
+UINT AI2(){
     return adcResults[1];
 }
 
-int AI3(){
+UINT AI3(){
     return adcResults[2];
 }
 
-int AI4(){
+UINT AI4(){
     return adcResults[3];
 }
 
-int AI5(){
+UINT AI5(){
     return adcResults[4];
 }
 
-int AI5(){
-    return adcResults[5];
-}
-
-UINT TMR_FUNC_DATA[MAX_FUNC_TMR];
-UINT TMR_FUNC_VALUE[MAX_FUNC_TMR];
-UINT TMR(UINT id, UINT time, BOOL reset)
+BOOL TMR(UINT id, UINT time, BOOL reset)
 {
         if(!IS_PARAM_SET(TMR_FUNC_DATA[id],TIMER_ON))
         {
@@ -134,39 +107,45 @@ UINT TMR(UINT id, UINT time, BOOL reset)
                 {
                         TMR_FUNC_VALUE[id]=time;
 		}
+
+                if(TMR_FUNC_VALUE[id] == 0)
+                {
+                    TMR_FUNC_VALUE[id] = time;
+                    return 1;
+                }
+
 	}
-        return (IS_PARAM_SET(TMR_FUNC_DATA[id], TIMER_OVF))?1:0;
+        return 0;
 }
 
-BOOL FLP_FUNC_DATA[MAX_FUNC_FLP];
-BOOL FLP(INT id, BOOL set, BOOL reset)
+BOOL FLIP(UINT id, BOOL set, BOOL reset)
 {
 	if(set==1 && reset==0){
-                FLP_FUNC_DATA[id]=1;
+                FLIP_FUNC_DATA[id]=1;
 	}
 	if(reset==1){
-                FLP_FUNC_DATA[id]=0;
+                FLIP_FUNC_DATA[id]=0;
 	}
-        return FLP_FUNC_DATA[id];
+        return FLIP_FUNC_DATA[id];
 }
 
-BOOL RISE_EDG_DATA[MAX_FUNC_RISE_EDG];
-BOOL RISE_EDG(INT id, BOOL pulse)
+
+BOOL RISE(UINT id, BOOL pulse)
 {
-    BOOL prev = RISE_EDG_DATA[id];
-    RISE_EDG_DATA[id] = pulse & 0x01;
-    return (prev < RISE_EDG_DATA[id]);
+    BOOL prev = RISE_FUNC_DATA[id];
+    RISE_FUNC_DATA[id] = pulse & 0x01;
+    return (prev < RISE_FUNC_DATA[id]);
 }
 
-BOOL FALL_EDG_DATA[MAX_FUNC_FALL_EDG];
-BOOL FALL_EDG(INT id, BOOL pulse)
+
+BOOL FALL(UINT id, BOOL pulse)
 {
-    BOOL prev = FALL_EDG_DATA[id];
-    FALL_EDG_DATA[id] = pulse & 0x01;
-    return (prev > FALL_EDG_DATA[id]);
+    BOOL prev = FALL_FUNC_DATA[id];
+    FALL_FUNC_DATA[id] = pulse & 0x01;
+    return (prev > FALL_FUNC_DATA[id]);
 }
 
-UINT CNT_FUNC_DATA[MAX_FUNC_CNT];
+
 UINT CNT(UINT id, BOOL pulse, BOOL reset)
 {
         if((pulse & 0x01) == 1)
@@ -183,7 +162,7 @@ UINT CNT(UINT id, BOOL pulse, BOOL reset)
         return CNT_FUNC_DATA[id];
 }
 
-void SND(INT pulse, INT val){
+void SND(BOOL pulse, INT val){
 	if((pulse & 0x01)==1){
 		USART_WriteInt(val);
 		USART_WriteChar('\r');

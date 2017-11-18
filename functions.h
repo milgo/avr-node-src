@@ -12,7 +12,6 @@ typedef char* String128;
 
 /*VARDEF*/ #define UINT uint16_t
 /*VARDEF*/ #define INT int
-/*VARDEF*/ #define REAL float
 /*VARDEF*/ #define STR String128
 /*VARDEF*/ #define BOOL uint8_t
 
@@ -23,24 +22,22 @@ typedef char* String128;
 /*OUTPUT*/ void DO4(BOOL out);
 /*OUTPUT*/ void DO5(BOOL out);
 
-/*OUTPUT*/ void AO1(UINT out);
-
 /*INPUT*/ BOOL DI1(void);
 /*INPUT*/ BOOL DI2(void);
 /*INPUT*/ BOOL DI3(void);
 /*INPUT*/ BOOL DI4(void);
 /*INPUT*/ BOOL DI5(void);
 
-/*INPUT*/ INT AI1(void);
-/*INPUT*/ INT AI2(void);
-/*INPUT*/ INT AI3(void);
-/*INPUT*/ INT AI4(void);
-/*INPUT*/ INT AI5(void);
-/*INPUT*/ INT AI5(void);
+/*INPUT*/ UINT AI1(void);
+/*INPUT*/ UINT AI2(void);
+/*INPUT*/ UINT AI3(void);
+/*INPUT*/ UINT AI4(void);
+/*INPUT*/ UINT AI5(void);
 
-/*FNCDEF,UNIQUE*/ INT FLP(UINT id, BOOL set, BOOL reset);
-/*FNCDEF,UNIQUE*/ INT TMR(UINT id, UINT time, BOOL reset);
-/*FNCDEF,UNIQUE*/ INT EDG(UINT id, BOOL pulse);
+/*FNCDEF,UNIQUE*/ BOOL FLIP(UINT id, BOOL set, BOOL reset);
+/*FNCDEF,UNIQUE*/ BOOL TMR(UINT id, UINT time, BOOL reset);
+/*FNCDEF,UNIQUE*/ BOOL RISE(UINT id, BOOL pulse);
+/*FNCDEF,UNIQUE*/ BOOL FALL(UINT id, BOOL pulse);
 /*FNCDEF,UNIQUE*/ UINT CNT(UINT id, BOOL pulse, BOOL reset);
 
 /*FNCDEF*/ void SND(BOOL pulse, INT val);
