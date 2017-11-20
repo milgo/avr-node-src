@@ -3,7 +3,6 @@
 
 volatile UINT adcResults[ADC_CHANNELS];
 volatile UINT adcIsrChnl=0;
-volatile UINT real_time=0;
 
 UINT CNT_FUNC_DATA[MAX_FUNC_CNT];
 BOOL FALL_FUNC_DATA[MAX_FUNC_FALL];
@@ -22,13 +21,15 @@ void end()
 
 }
 
-void init(){
+void init()
+{
 	int i;
         for(i=0; i<MAX_FUNC_CNT; i++)CNT_FUNC_DATA[i]=0;
         for(i=0; i<MAX_FUNC_FALL; i++)FALL_FUNC_DATA[i]=0;
-        for(i=0; i<MAX_COUNTERS; i++)CNT_FUNC_DATA[i]=0;
+        for(i=0; i<MAX_FUNC_FLIP; i++)FLIP_FUNC_DATA[i]=0;
         for(i=0; i<MAX_FUNC_RISE; i++)RISE_FUNC_DATA[i]=0;
-        for(i=0; i<MAX_FUNC_TMR; i++){
+        for(i=0; i<MAX_FUNC_TMR; i++)
+        {
             TMR_FUNC_DATA[i]=0;
             TMR_FUNC_VALUE[i]=0;
         }
@@ -198,44 +199,30 @@ BOOL NOT(BOOL a){
 }
 
 /* Timer0 overflow interrupt */
-//int c=0;
-//int on=0;
 ISR (TIMER0_OVF_vect)
 {
-	TCNT0 += 6; /* That makes timer to overflow every 1ms */
-	/*c++;
-	if(c >1000){
-		if(on == 0){on=1;}
-		else{on=0;}
-		c = 0;
-	}
-	O2(on);*/
-	real_time++;
-	int i;
-        for(i=0; i<MAX_FUNC_TMR; i++){
-                if(IS_PARAM_SET(TMR_FUNC_DATA[i], TIMER_ON) && TMR_FUNC_VALUE[i]>0){
+        TCNT0 = 6; /* That makes timer to overflow every 1ms */
+        int i;
+        for(i=0; i<MAX_FUNC_TMR; i++)
+        {
+                if(IS_PARAM_SET(TMR_FUNC_DATA[i], TIMER_ON) && TMR_FUNC_VALUE[i]>0)
+                {
                         TMR_FUNC_VALUE[i]--;
 		}
-	}
-    /* Event is executed every 4ms here */
+        }
 }
 
 ISR(ADC_vect)
 {
     // Save conversion result.
     adcResults[adcIsrChnl] = ADC;
-	USART_WriteString("[");
-	USART_WriteInt(adcIsrChnl);
-	USART_WriteString("]:");	
-	USART_WriteInt(adcResults[adcIsrChnl]);
-		USART_WriteChar(',');
     // Next channel.
     if (++adcIsrChnl > ADC_CHANNELS-1)
     {
         adcIsrChnl = 0;
     }
 
-	ADMUX = (1<<REFS0) | (adcIsrChnl & 0b00001111);
+    ADMUX = (1<<REFS0) | (adcIsrChnl & 0b00001111);
 	
     // Start the next conversion.    
     ADCSRA |= (1<<ADSC);
@@ -243,5 +230,5 @@ ISR(ADC_vect)
 
 void USART_RecvInt(char data)
 {
-	USART_WriteChar(data);
+    USART_WriteChar(data);
 }
