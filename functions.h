@@ -10,45 +10,45 @@
 
 typedef char* String128;
 
-/*VARDEF*/ #define UINT uint16_t
-/*VARDEF*/ #define INT int
-/*VARDEF*/ #define STR String128
-/*VARDEF*/ #define BOOL uint8_t
+volatile uint32_t _data[MAX_DATA];
+
+/*VARDEF*/ #define UINT uint32_t
+/*VARDEF*/ #define INT uint32_t
+/*VARDEF*/ #define BOOL uint32_t
 
 
-/*OUTPUT*/ void DO1(BOOL out);
-/*OUTPUT*/ void DO2(BOOL out);
-/*OUTPUT*/ void DO3(BOOL out);
-/*OUTPUT*/ void DO4(BOOL out);
-/*OUTPUT*/ void DO5(BOOL out);
+/*OUTPUT*/ void DO1(UINT id, BOOL out);
+/*OUTPUT*/ void DO2(UINT id, BOOL out);
+/*OUTPUT*/ void DO3(UINT id, BOOL out);
+/*OUTPUT*/ void DO4(UINT id, BOOL out);
+/*OUTPUT*/ void DO5(UINT id, BOOL out);
 
-/*INPUT*/ BOOL DI1(void);
-/*INPUT*/ BOOL DI2(void);
-/*INPUT*/ BOOL DI3(void);
-/*INPUT*/ BOOL DI4(void);
-/*INPUT*/ BOOL DI5(void);
+/*INPUT*/ BOOL DI1(UINT id);
+/*INPUT*/ BOOL DI2(UINT id);
+/*INPUT*/ BOOL DI3(UINT id);
+/*INPUT*/ BOOL DI4(UINT id);
+/*INPUT*/ BOOL DI5(UINT id);
 
-/*INPUT*/ UINT AI1(void);
-/*INPUT*/ UINT AI2(void);
-/*INPUT*/ UINT AI3(void);
-/*INPUT*/ UINT AI4(void);
-/*INPUT*/ UINT AI5(void);
+/*INPUT*/ UINT AI1(UINT id);
+/*INPUT*/ UINT AI2(UINT id);
+/*INPUT*/ UINT AI3(UINT id);
+/*INPUT*/ UINT AI4(UINT id);
+/*INPUT*/ UINT AI5(UINT id);
 
-/*FUNCTION,UNIQUE*/ BOOL FLIP(UINT id, BOOL set, BOOL reset);
-/*FUNCTION,UNIQUE*/ BOOL TMR(UINT id, UINT time, BOOL reset);
-/*FUNCTION,UNIQUE*/ BOOL RISE(UINT id, BOOL pulse);
-/*FUNCTION,UNIQUE*/ BOOL FALL(UINT id, BOOL pulse);
-/*FUNCTION,UNIQUE*/ UINT CNT(UINT id, BOOL pulse, BOOL reset);
+/*FUNCTION*/ BOOL FLIP(UINT id, BOOL set, BOOL reset);
+/*FUNCTION*/ BOOL TMR(UINT id, UINT time, BOOL reset);
+/*FUNCTION*/ BOOL RISE(UINT id, BOOL pulse);
+/*FUNCTION*/ BOOL FALL(UINT id, BOOL pulse);
+/*FUNCTION*/ UINT CNT(UINT id, BOOL pulse, BOOL reset);
 
-/*FUNCTION*/ void SND(BOOL pulse, INT val);
+/*FUNCTION*/ void SND(UINT id, BOOL pulse, INT val);
 
-
-/*FUNCTION*/ INT CGT(INT a, INT b);
-/*FUNCTION*/ INT CLT(INT a, INT b);
-/*FUNCTION*/ INT CEQ(INT a, INT b);
-/*FUNCTION*/ BOOL AND(BOOL a, BOOL b);
-/*FUNCTION*/ BOOL OR(BOOL a, BOOL b);
-/*FUNCTION*/ BOOL NOT(BOOL a);
+/*FUNCTION*/ INT CGT(UINT id, INT a, INT b);
+/*FUNCTION*/ INT CLT(UINT id, INT a, INT b);
+/*FUNCTION*/ INT CEQ(UINT id, INT a, INT b);
+/*FUNCTION*/ BOOL AND(UINT id, BOOL a, BOOL b);
+/*FUNCTION*/ BOOL OR(UINT id, BOOL a, BOOL b);
+/*FUNCTION*/ BOOL NOT(UINT id, BOOL a);
 
 
 #endif
