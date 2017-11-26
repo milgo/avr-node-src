@@ -4,6 +4,7 @@
 void loop()
 {
 	begin();
-	DO1(1,AND(0,DI4(2),DI3(3)));
+	setBOOL(INPUT1, DI3(2));
+	DO1(3,FLIP(0,TMR(1,1000,getBOOL(INPUT1)),getBOOL(INPUT1)));
 	end();
 }

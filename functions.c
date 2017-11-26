@@ -92,6 +92,7 @@ UINT UCONST(UINT cnst){
 
 BOOL TMR(UINT id, UINT time, BOOL reset)
 {
+
         if(!IS_PARAM_SET(_data[id], TIMER_ON))
         {
                 _data[id] |= TIMER_ON | time;
@@ -100,12 +101,16 @@ BOOL TMR(UINT id, UINT time, BOOL reset)
         {
                 if((reset & 0x01) == 1)
                 {
+                    _data[id] = 0;
                     _data[id] |= TIMER_ON | time;
+                    USART_WriteChar('r');
 		}
 
-                if(_data[id] <= 0)
+                if((int)_data[id] <= 0)
                 {
+                    _data[id] = 0;
                     _data[id] |= TIMER_ON | time;
+                    USART_WriteChar('t');
                     return 1;
                 }
                 else
