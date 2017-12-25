@@ -6,7 +6,9 @@
 #include <avr/interrupt.h>
 #include "uart.h"
 
-#define SET_PIN(P,B,V) if(V==0){P&=~_BV(B);}else{P|=_BV(B);}
+//#define SET_PIN(P,B,V) if(V==0){P&=~_BV(B);}else{P|=_BV(B);} //SOURCE
+#define SET_PIN(P,B,V) if(V==1){P&=~_BV(B);}else{P|=_BV(B);} //SINK
+
 #define GET_PIN(P,B) !(P & _BV(B));
 
 #define SET_PARAM(VAR,VAL) VAR|=VAL

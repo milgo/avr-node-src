@@ -3,9 +3,11 @@
 void setup(){
 	/* Setup outputs */
 	DDRD |= _BV(5) | _BV(6) | _BV(7);
-	PORTD &= ~_BV(5) & ~_BV(6) & ~_BV(7);
+	//PORTD &= ~_BV(5) & ~_BV(6) & ~_BV(7); //SOURCE 
+	PORTD |= _BV(5) | _BV(6) | _BV(7); //SINK
 	DDRB |= _BV(0) | _BV(1);
-	PORTB &= ~_BV(0) & ~_BV(1);
+	//PORTB &= ~_BV(0) & ~_BV(1); //SOURCE
+	PORTB |=  _BV(0) |  _BV(1); //SINK
 
 	/* Setup inputs */
 	DDRD &= /*~_BV(0) & ~_BV(1) &*/ ~_BV(2) & ~_BV(3) & ~_BV(4);
