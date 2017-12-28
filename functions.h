@@ -26,8 +26,6 @@ volatile uint32_t _data[MAX_DATA];
 /*INPUT*/ BOOL DI1(UINT id);
 /*INPUT*/ BOOL DI2(UINT id);
 /*INPUT*/ BOOL DI3(UINT id);
-/*INPUT*/ BOOL DI4(UINT id);
-/*INPUT*/ BOOL DI5(UINT id);
 
 /*INPUT*/ UINT AI1(UINT id);
 /*INPUT*/ UINT AI2(UINT id);

@@ -7,6 +7,15 @@ volatile uint32_t _data[MAX_DATA];
 volatile uint32_t time = 0;
 volatile uint32_t dtime = 0;
 
+volatile union SerialData{
+    uint32_t data32;
+    uint16_t data16[2];
+    char buffer[4];
+}serialQuery, serialResponse;
+
+volatile char buffer[4];
+volatile uint8_t bufferCounter = 0;
+
 void begin()
 {
     if(time>0)
@@ -27,43 +36,43 @@ void init()
 }
 
 void DO1(UINT id, BOOL out){
-        SET_PIN(PORTD, 5, out)
+        SET_PIN(PORTD, 5, out);
+	_data[id] = out;
 }
 
 void DO2(UINT id, BOOL out){
-        SET_PIN(PORTD, 6, out)
+        SET_PIN(PORTD, 6, out);
+	_data[id] = out;
 }
 
 void DO3(UINT id, BOOL out){
-        SET_PIN(PORTD, 7, out)
+        SET_PIN(PORTD, 7, out);
+	_data[id] = out;
 }
 
 void DO4(UINT id, BOOL out){
-        SET_PIN(PORTB, 0, out)
+        SET_PIN(PORTB, 0, out);
+	_data[id] = out;
 }
 
 void DO5(UINT id, BOOL out){
-        SET_PIN(PORTB, 1, out)
+        SET_PIN(PORTB, 1, out);
+	_data[id] = out;
 }
-
+	
 BOOL DI1(UINT id){
-	return GET_PIN(PIND, 0);
+	_data[id] = GET_PIN(PIND, 2);
+	return _data[id];
 }
-	
+
 BOOL DI2(UINT id){
-	return GET_PIN(PIND, 1);
+	_data[id] = GET_PIN(PIND, 3);
+	return _data[id];
 }
-	
+
 BOOL DI3(UINT id){
-	return GET_PIN(PIND, 2);
-}
-
-BOOL DI4(UINT id){
-	return GET_PIN(PIND, 3);
-}
-
-BOOL DI5(UINT id){
-	return GET_PIN(PIND, 4);
+	_data[id] = GET_PIN(PIND, 4);
+	return _data[id];
 }
 
 UINT AI1(UINT id){
@@ -232,5 +241,24 @@ ISR(ADC_vect)
 
 void USART_RecvInt(char data)
 {
-    USART_WriteChar(data);
+    serialQuery.buffer[bufferCounter]=data;
+
+    bufferCounter++;
+    if(bufferCounter>3)
+    {
+        bufferCounter=0;
+
+        uint8_t command = (serialQuery.data16[0] >> 8) & 0xFF;
+        uint8_t data = (serialQuery.data16[1] >> 8) & 0xFF;
+
+        if(command == 1) //acquire value
+        {
+            if(data < (uint8_t)MAX_DATA)
+            {
+                serialResponse.data32 = _data[data];
+                int i;
+                for(i=3;i>=0;i--)USART_WriteChar(serialResponse.buffer[i]);
+            }
+        }
+    }
 }
