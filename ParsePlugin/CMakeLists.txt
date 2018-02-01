@@ -18,3 +18,7 @@ install(FILES ParsePlugin DESTINATION ./)
 
 target_link_libraries(ParsePlugin Qt5::Core)
 
+add_custom_command(TARGET ParsePlugin
+                   POST_BUILD
+                   COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:ParsePlugin> "${CMAKE_CURRENT_SOURCE_DIR}/.."
+                   COMMENT "Copying plugin...")
