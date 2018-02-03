@@ -18,15 +18,20 @@ public:
 
     ParsePlugin();
     QObject* getObject() override;
-    bool load() override;
-    void compile(QString jsonProgram) override;
+
+    bool parseFiles() override;
+    void compile(QJsonObject programJson) override;
+    void build() override;
+    void program() override;
+    void download() override;
+    void upload() override;
+    void connect(QJsonObject connectionJson) override;
 
 signals:
 
-    void onParseNewVariable(QString varType);
-    void onParseNewFunctionBlock(QString funcName,
-                                 QString funcType,
-                                 QString jsonArgs);
+    void onParseNewConstType(QJsonObject constJson);
+    void onParseNewVariableType(QJsonObject varJson);
+    void onParseNewFunctionBlock(QJsonObject funcJson);
 };
 
 #endif // PLUGIN_H
