@@ -18,13 +18,11 @@ getObject ()
 
 bool
 ParsePlugin::
-parseFiles()
+parseFiles(QString path)
 {
-    QString filePath;
-
-    QFile file(filePath.toLatin1());
+    QFile file(path.toLatin1());
     if(!file.open(QIODevice::ReadOnly)) {
-        //QMessageBox::information(0, "Error", file.errorString());
+        emit this->onErrorMessage(QString("ParsePlugin: Could not find files to parse!"));
         return false;
     }
 
@@ -107,13 +105,92 @@ parseFiles()
 
 void
 ParsePlugin::
-compile(QJsonObject programJson)
+compile(QJsonObject program, QString path)
 {
+    QFile hfile( path + "/variables.h" );
+    if ( hfile.open(QIODevice::WriteOnly) )
+    {
+        QTextStream stream( &hfile );
+        stream << "#ifndef _VARIABLES_H_\r\n";
+        stream << "#define _VARIABLES_H_\r\n\r\n";
+        stream << "#include \"functions.h\"\r\n";
+        stream << "#include \"max.h\"\r\n\r\n";
+
+        QJsonArray variables = program["variables"].toArray();
+
+        foreach (const QJsonValue & value, variables)
+        {
+            QJsonObject obj = value.toObject();
+            stream << "#define " << obj["name"].toString() << " " << obj["id"].toString() << "\r\n";
+        }
+
+        stream << "\r\n" << endl;
+
+        //declare variable arrays, setters and getters
+        QJsonArray types = program["types"].toArray();
+
+        foreach (const QJsonValue & value, types)
+        {
+            QString typeName = value.toString();
+            stream << typeName << " set" << typeName << "(uint32_t index, " << typeName << " value);\r\n";
+            stream << typeName << " get" << typeName << "(uint32_t index);" << "\r\n\r\n";
+        }
+
+        stream << "#endif" << endl;
+    }
+
+    //generate max definition file
+    QFile mfile( path + "/max.h" );
+    if ( mfile.open(QIODevice::WriteOnly) )
+    {
+        QTextStream stream( &mfile );
+        stream << "#ifndef _MAX_H_" << "\r\n";
+        stream << "#define _MAX_H_" << "\r\n\r\n";
+        stream << "#define MAX_DATA" << " " << program["data_size"].toString() << "\r\n";
+        stream << "\r\n#endif" << "\r\n";
+    }
+
+    QFile cfile( path + "/variables.c" );
+    if ( cfile.open(QIODevice::WriteOnly) )
+    {
+        QTextStream stream( &cfile );
+        stream << "#include \"variables.h\"\r\n\r\n";
+
+        QJsonArray types = program["types"].toArray();
+        foreach (const QJsonValue & value, types)
+        {
+            QString typeName = value.toString();
+            stream << typeName << " set" << typeName << "(uint32_t index, " << typeName << " value){_data[index]=value; return value;}\r\n";
+            stream << typeName << " get" << typeName << "(uint32_t index){return _data[index];}\r\n";
+        }
+    }
+
+    QFile pfile( path + "/program.c" );
+    if( pfile.open(QIODevice::WriteOnly))
+    {
+        QTextStream stream( &pfile );
+        stream << "#include \"program.h\"\r\n";
+        stream << "#include \"variables.h\"\r\n\r\n";
+        stream << "void loop()\r\n{\r\n\tbegin();\r\n";
+
+        QJsonArray nodes = program["program"].toArray();
+        foreach (const QJsonValue & value, nodes)
+        {
+            QJsonObject obj = value.toObject();
+
+            if(!obj["root"].toString().compare("1"))
+            {
+                stream << "\t" + compileNode(nodes, obj).toLatin1() + ";\r\n";
+            }
+        }
+
+        stream << "\tend();\r\n}\r\n";
+    }
 }
 
 void
 ParsePlugin::
-build()
+build(QString path)
 {
 
 }
@@ -144,4 +221,44 @@ ParsePlugin::
 connect(QJsonObject connectionJson)
 {
 
+}
+
+QString
+ParsePlugin::
+compileNode(QJsonArray program, QJsonObject root)
+{
+    QString result(root["name"].toString()+"("+root["id"].toString());
+
+    QJsonArray args = root["args"].toArray();
+    int argsSize = args.count();
+    int argCounter = 0;
+    if(argsSize > 0)result.append(",");
+    foreach (const QJsonValue & arg, args)
+    {
+        QString param = arg.toString();
+        QStringList paramSplit = param.split(":");
+
+        if(!paramSplit.at(0).compare("CONST"))
+        {
+            result.append(paramSplit.at(1));
+        }
+        else
+        {
+            foreach(const QJsonValue & node, program)
+            {
+                QJsonObject obj = node.toObject();
+                if(!obj["type"].toString().compare(paramSplit.at(0))&&
+                        !obj["id"].toString().compare(paramSplit.at(1)))
+                {
+                    result.append(compileNode(program, obj));
+                }
+            }
+        }
+        argCounter++;
+        if(argCounter<argsSize)
+            result.append(",");
+    }
+
+    result.append(")");
+    return result;
 }
