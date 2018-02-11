@@ -16,14 +16,19 @@ getObject ()
     return this;
 }
 
-bool
+QJsonObject
 ParsePlugin::
 parseFiles(QString path)
 {
+    QJsonObject resultJson;
+    QJsonArray varTypes;
+    QJsonArray constTypes;
+    QJsonArray functions;
+
     QFile file(path.toLatin1());
     if(!file.open(QIODevice::ReadOnly)) {
         emit this->onErrorMessage(QString("ParsePlugin: Could not find files to parse!"));
-        return false;
+        return resultJson;
     }
 
     QTextStream in(&file);
@@ -38,7 +43,8 @@ parseFiles(QString path)
             QStringList split = line.split(" ");
             QJsonObject varJson;
             varJson["type"] = split[1];
-            emit this->onParseNewVariableType(varJson);
+            //emit this->onParseNewVariableType(varJson);
+            varTypes.append(varJson);
         }
         else if(line.startsWith("/*"))
         {
@@ -86,21 +92,27 @@ parseFiles(QString path)
           funcJson["args"] = funcArgsJson;
 
           if(funcJson["name"].toString().length()>0)
-            emit this->onParseNewFunctionBlock(funcJson);
+              functions.append(funcJson);
+            //emit this->onParseNewFunctionBlock(funcJson);
         }
     }
 
-    QJsonObject constJSon;
-    constJSon["name"] = QString("UCONST");
-    constJSon["type"] = QString("UINT");
-    constJSon["returnType"] = QString("UINT");
-    constJSon["category"] = QString("CONSTS");
+    QJsonObject constJson;
+    constJson["name"] = QString("UCONST");
+    constJson["type"] = QString("UINT");
+    constJson["returnType"] = QString("UINT");
+    constJson["category"] = QString("CONSTS");
 
-    emit onParseNewConstType(constJSon);
+    //emit onParseNewConstType(constJSon);
+    constTypes.append(constJson);
+
+    resultJson["variable_types"] = varTypes;
+    resultJson["const_types"] = constTypes;
+    resultJson["functions"] = functions;
 
     file.close();
 
-    return true;
+    return resultJson;
 }
 
 void

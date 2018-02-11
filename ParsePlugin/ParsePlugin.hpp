@@ -19,7 +19,7 @@ public:
     ParsePlugin();
     QObject* getObject() override;
 
-    bool parseFiles(QString path) override;
+    QJsonObject parseFiles(QString path) override;
     void compile(QJsonObject program, QString path) override;
     void build(QString path) override;
     void program() override;
@@ -29,10 +29,10 @@ public:
 
 signals:
 
-    void onParseNewConstType(QJsonObject constJson);
+    /*void onParseNewConstType(QJsonObject constJson);
     void onParseNewVariableType(QJsonObject varJson);
-    void onParseNewFunctionBlock(QJsonObject funcJson);
-    void onErrorMessage(QString message);
+    void onParseNewFunctionBlock(QJsonObject funcJson);*/
+    void onErrorMessage(QString message) override;
 
 private:
 
