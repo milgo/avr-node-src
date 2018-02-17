@@ -21,17 +21,9 @@ public:
 
     QJsonObject parseFiles(QString path) override;
     void compile(QJsonObject program, QString path) override;
-    void build(QString path) override;
-    void program() override;
-    void download() override;
-    void upload() override;
-    void connect(QJsonObject connection) override;
 
 signals:
 
-    /*void onParseNewConstType(QJsonObject constJson);
-    void onParseNewVariableType(QJsonObject varJson);
-    void onParseNewFunctionBlock(QJsonObject funcJson);*/
     void onErrorMessage(QString message) override;
 
 private:

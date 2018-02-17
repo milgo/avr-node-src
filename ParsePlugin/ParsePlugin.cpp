@@ -200,41 +200,6 @@ compile(QJsonObject program, QString path)
     }
 }
 
-void
-ParsePlugin::
-build(QString path)
-{
-
-}
-
-void
-ParsePlugin::
-program()
-{
-
-}
-
-void
-ParsePlugin::
-download()
-{
-
-}
-
-void
-ParsePlugin::
-upload()
-{
-
-}
-
-void
-ParsePlugin::
-connect(QJsonObject connectionJson)
-{
-
-}
-
 QString
 ParsePlugin::
 compileNode(QJsonArray program, QJsonObject root)
