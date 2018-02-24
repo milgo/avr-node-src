@@ -1,5 +1,5 @@
-#ifndef PLUGIN_INTERFACE_H
-#define PLUGIN_INTERFACE_H
+#ifndef PARSEPLUGIN_INTERFACE_H
+#define PARSEPLUGIN_INTERFACE_H
 
 #include <QtPlugin>
 #include <QObject>
@@ -18,4 +18,4 @@ public:
 
 Q_DECLARE_INTERFACE(IParsePlugin, "IParsePlugin")
 
-#endif // PLUGIN_INTERFACE_H
+#endif // PARSEPLUGIN_INTERFACE_H

@@ -186,13 +186,15 @@ compile(QJsonObject program, QString path)
         stream << "void loop()\r\n{\r\n\tbegin();\r\n";
 
         QJsonArray nodes = program["program"].toArray();
+        QJsonArray variables = program["variables"].toArray();
+
         foreach (const QJsonValue & value, nodes)
         {
             QJsonObject obj = value.toObject();
 
             if(!obj["root"].toString().compare("1"))
             {
-                stream << "\t" + compileNode(nodes, obj).toLatin1() + ";\r\n";
+                stream << "\t" + compileNode(nodes, variables, obj).toLatin1() + ";\r\n";
             }
         }
 
@@ -202,12 +204,35 @@ compile(QJsonObject program, QString path)
 
 QString
 ParsePlugin::
-compileNode(QJsonArray program, QJsonObject root)
+compileNode(QJsonArray program, QJsonArray variables, QJsonObject root)
 {
-    QString result(root["name"].toString()+"("+root["id"].toString());
-
     QJsonArray args = root["args"].toArray();
     int argsSize = args.count();
+
+    QString result;
+    if(!root["type"].toString().compare("VARIABLE"))
+    {
+        QString varType;
+        foreach (const QJsonValue & var, variables)
+        {
+            if(!var["name"].toString().compare(root["name"].toString())){
+                varType = var["type"].toString();
+                break;
+            }
+        }
+
+        if(argsSize>0){
+            result = QString("set"+varType+"("+root["id"].toString());
+        }
+        else{
+            result = QString("get"+varType+"("+root["id"].toString());
+        }
+    }
+    else if(!root["type"].toString().compare("FUNCTION"))
+    {
+        result = QString(root["name"].toString()+"("+root["id"].toString());
+    }
+
     int argCounter = 0;
     if(argsSize > 0)result.append(",");
     foreach (const QJsonValue & arg, args)
@@ -227,7 +252,7 @@ compileNode(QJsonArray program, QJsonObject root)
                 if(!obj["type"].toString().compare(paramSplit.at(0))&&
                         !obj["id"].toString().compare(paramSplit.at(1)))
                 {
-                    result.append(compileNode(program, obj));
+                    result.append(compileNode(program, variables, obj));
                 }
             }
         }

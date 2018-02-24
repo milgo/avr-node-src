@@ -1,5 +1,5 @@
-#ifndef PLUGIN_H
-#define PLUGIN_H
+#ifndef PARSEPLUGIN_H
+#define PARSEPLUGIN_H
 
 #include <QtPlugin>
 #include <QObject>
@@ -28,7 +28,7 @@ signals:
 
 private:
 
-    QString compileNode(QJsonArray program, QJsonObject root);
+    QString compileNode(QJsonArray program, QJsonArray variables, QJsonObject root);
 };
 
-#endif // PLUGIN_H
+#endif // PARSEPLUGIN_H
