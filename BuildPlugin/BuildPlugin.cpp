@@ -41,8 +41,6 @@ build(QJsonObject buildInfo)
     for(int i=0;i<stderrlist.length();i++){
         onErrorMessage(stderrlist[i]);
     }
-
-    consoleWidget->setCurrentRow(consoleWidget->count()-1);
 }
 
 
