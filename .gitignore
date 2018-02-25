@@ -9,3 +9,6 @@
 .dep
 variables.h
 variables.c
+build-*
+*.log
+*.user
