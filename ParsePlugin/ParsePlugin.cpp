@@ -222,10 +222,10 @@ compileNode(QJsonArray program, QJsonArray variables, QJsonObject root)
         }
 
         if(argsSize>0){
-            result = QString("set"+varType+"("+root["id"].toString());
+            result = QString("set"+varType+"("+root["name"].toString());
         }
         else{
-            result = QString("get"+varType+"("+root["id"].toString());
+            result = QString("get"+varType+"("+root["name"].toString());
         }
     }
     else if(!root["type"].toString().compare("FUNCTION"))
