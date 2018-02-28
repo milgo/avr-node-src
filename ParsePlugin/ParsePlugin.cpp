@@ -72,6 +72,12 @@ parseFiles(QString path)
                   funcJson["name"] = split[1].toUpper();;
                   funcJson["returnType"] = split[0].toUpper();
                   funcJson["category"] = categoryName;
+                  funcJson["isBoolType"] = QString("0");
+                  funcJson["isVoidType"] = QString("0");
+                  if(!funcJson["returnType"].toString().compare("BOOL"))
+                      funcJson["isBoolType"] = QString("1");
+                  if(!funcJson["returnType"].toString().compare("VOID"))
+                      funcJson["isVoidType"] = QString("1");
               }
               else if(counter == 1)
               {
