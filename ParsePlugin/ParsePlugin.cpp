@@ -244,6 +244,18 @@ compileNode(QJsonArray program, QJsonArray variables, QJsonObject root)
         {
             result.append(paramSplit.at(1));
         }
+        if(!paramSplit.at(0).compare("VARIABLE"))
+        {
+            QString varType;
+            foreach (const QJsonValue & var, variables)
+            {
+                if(!var["name"].toString().compare(paramSplit.at(1))){
+                    varType = var["type"].toString();
+                    break;
+                }
+            }
+            result.append("get"+varType+"("+paramSplit.at(1)+")");
+        }
         else
         {
             foreach(const QJsonValue & node, program)
