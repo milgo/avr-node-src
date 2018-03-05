@@ -3,6 +3,7 @@
 
 #include <QtPlugin>
 #include <QObject>
+#include <QProcess>
 
 #include "BuildPlugin_global.hpp"
 #include "IBuildPlugin.hpp"
@@ -21,10 +22,21 @@ public:
 
     void build(QJsonObject buildInfo) override;
 
+public slots:
+
+    void readStdout();
+    void readStderr();
+    void processFinished(int exitCode, QProcess::ExitStatus exitStatus);
+    void processError(QProcess::ProcessError error);
+
 signals:
 
     void onErrorMessage(QString message) override;
     void onInfoMessage(QString message) override;
+
+private:
+
+    QProcess process;
 
 };
 
