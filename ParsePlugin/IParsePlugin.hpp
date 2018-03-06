@@ -12,7 +12,7 @@ public:
     virtual ~IParsePlugin() {}
     virtual QObject* getObject() = 0;
     virtual QJsonObject parseFiles(QString path) = 0;
-    virtual void compile(QJsonObject program, QString path) = 0;
+    virtual bool compile(QJsonObject program, QString path) = 0;
     virtual void onErrorMessage(QString message) = 0;
 };
 

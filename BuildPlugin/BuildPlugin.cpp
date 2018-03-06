@@ -20,13 +20,14 @@ getObject ()
     return this;
 }
 
-void
+bool
 BuildPlugin::
 build(QJsonObject buildInfo)
 {
     QString workingDir = buildInfo["build_directory"].toString();
     process.setWorkingDirectory(workingDir);
     process.start("make");
+    return true;
 }
 
 void BuildPlugin::readStdout()

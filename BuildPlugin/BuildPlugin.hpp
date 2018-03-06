@@ -20,7 +20,7 @@ public:
     BuildPlugin();
     QObject* getObject() override;
 
-    void build(QJsonObject buildInfo) override;
+    bool build(QJsonObject buildInfo) override;
 
 public slots:
 

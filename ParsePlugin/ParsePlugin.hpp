@@ -20,7 +20,7 @@ public:
     QObject* getObject() override;
 
     QJsonObject parseFiles(QString path) override;
-    void compile(QJsonObject program, QString path) override;
+    bool compile(QJsonObject program, QString path) override;
 
 signals:
 

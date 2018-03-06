@@ -121,7 +121,7 @@ parseFiles(QString path)
     return resultJson;
 }
 
-void
+bool
 ParsePlugin::
 compile(QJsonObject program, QString path)
 {
@@ -156,6 +156,11 @@ compile(QJsonObject program, QString path)
 
         stream << "#endif" << endl;
     }
+    else
+    {
+        emit this->onErrorMessage(QString("ParsePlugin: compilation error (1)"));
+        return false;
+    }
 
     //generate max definition file
     QFile mfile( path + "/max.h" );
@@ -166,6 +171,11 @@ compile(QJsonObject program, QString path)
         stream << "#define _MAX_H_" << "\r\n\r\n";
         stream << "#define MAX_DATA" << " " << program["data_size"].toString() << "\r\n";
         stream << "\r\n#endif" << "\r\n";
+    }
+    else
+    {
+        emit this->onErrorMessage(QString("ParsePlugin: compilation error (2)"));
+        return false;
     }
 
     QFile cfile( path + "/variables.c" );
@@ -181,6 +191,11 @@ compile(QJsonObject program, QString path)
             stream << typeName << " set" << typeName << "(uint32_t index, " << typeName << " value){_data[index]=value; return value;}\r\n";
             stream << typeName << " get" << typeName << "(uint32_t index){return _data[index];}\r\n";
         }
+    }
+    else
+    {
+        emit this->onErrorMessage(QString("ParsePlugin: compilation error (3)"));
+        return false;
     }
 
     QFile pfile( path + "/program.c" );
@@ -206,6 +221,12 @@ compile(QJsonObject program, QString path)
 
         stream << "\tend();\r\n}\r\n";
     }
+    else
+    {
+        emit this->onErrorMessage(QString("ParsePlugin: compilation error (4)"));
+        return false;
+    }
+    return true;
 }
 
 QString
