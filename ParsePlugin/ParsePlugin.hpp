@@ -25,6 +25,11 @@ public:
 signals:
 
     void onErrorMessage(QString message) override;
+    void onInfoMessage(QString message) override;
+    void onParseSuccess() override;
+    void onParseFail() override;
+    void onCompileSuccess() override;
+    void onCompileFail() override;
 
 private:
 

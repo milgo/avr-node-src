@@ -28,95 +28,99 @@ parseFiles(QString path)
     QFile file(path.toLatin1());
     if(!file.open(QIODevice::ReadOnly)) {
         emit this->onErrorMessage(QString("ParsePlugin: Could not find files to parse!"));
-        return resultJson;
+        emit this->onParseFail();
     }
-
-    QTextStream in(&file);
-
-    QRegExp paramDefRegEx("\\w+ \\w+");
-    while(!in.atEnd())
+    else
     {
-        QString line = in.readLine().trimmed();
-        if(line.startsWith("/*VARDEF*/"))
+        QTextStream in(&file);
+
+        QRegExp paramDefRegEx("\\w+ \\w+");
+        while(!in.atEnd())
         {
-            line = line.remove(0,11);
-            QStringList split = line.split(" ");
-            QJsonObject varJson;
-            varJson["type"] = split[1];
-            //emit this->onParseNewVariableType(varJson);
-            varTypes.append(varJson);
+            QString line = in.readLine().trimmed();
+            if(line.startsWith("/*VARDEF*/"))
+            {
+                line = line.remove(0,11);
+                QStringList split = line.split(" ");
+                QJsonObject varJson;
+                varJson["type"] = split[1];
+                //emit this->onParseNewVariableType(varJson);
+                varTypes.append(varJson);
+            }
+            else if(line.startsWith("/*"))
+            {
+              QRegExp sep("(\\/\\*)|(\\*\\/)");
+              QStringList params = line.section(sep,1,1).split(",");
+              QString categoryName = params[0];
+
+              line = line.remove(0,line.indexOf("*\\")+2);
+              line = line.trimmed();
+
+              QJsonObject funcJson;
+              QJsonArray funcArgsJson;
+
+              int offset = 0;
+              int counter = 0;
+
+              while ( (offset = paramDefRegEx.indexIn(line, offset)) != -1 )
+              {
+                  offset += paramDefRegEx.matchedLength();
+
+                  QStringList split = paramDefRegEx.cap(0).split(QRegExp("\\s"));
+
+                  if(counter == 0)
+                  {
+                      funcJson["name"] = split[1].toUpper();;
+                      funcJson["returnType"] = split[0].toUpper();
+                      funcJson["category"] = categoryName;
+                      funcJson["isBoolType"] = QString("0");
+                      funcJson["isVoidType"] = QString("0");
+                      if(!funcJson["returnType"].toString().compare("BOOL"))
+                          funcJson["isBoolType"] = QString("1");
+                      if(!funcJson["returnType"].toString().compare("VOID"))
+                          funcJson["isVoidType"] = QString("1");
+                  }
+                  else if(counter == 1)
+                  {
+
+                  }
+                  else
+                  {
+                      QJsonObject arg;
+                      arg["name"] = split[1].toUpper();
+                      arg["type"] = split[0].toUpper();
+                      arg["value"] = QString("");
+                      funcArgsJson.append(arg);
+                  }
+
+                  counter++;
+              }
+
+              funcJson["args"] = funcArgsJson;
+
+              if(funcJson["name"].toString().length()>0)
+                  functions.append(funcJson);
+                //emit this->onParseNewFunctionBlock(funcJson);
+            }
         }
-        else if(line.startsWith("/*"))
-        {
-          QRegExp sep("(\\/\\*)|(\\*\\/)");
-          QStringList params = line.section(sep,1,1).split(",");
-          QString categoryName = params[0];
 
-          line = line.remove(0,line.indexOf("*\\")+2);
-          line = line.trimmed();
+        QJsonObject constJson;
+        constJson["name"] = QString("UCONST");
+        constJson["type"] = QString("UINT");
+        constJson["returnType"] = QString("UINT");
+        constJson["category"] = QString("CONSTS");
 
-          QJsonObject funcJson;
-          QJsonArray funcArgsJson;
+        //emit onParseNewConstType(constJSon);
+        constTypes.append(constJson);
 
-          int offset = 0;
-          int counter = 0;
+        resultJson["variable_types"] = varTypes;
+        resultJson["const_types"] = constTypes;
+        resultJson["functions"] = functions;
 
-          while ( (offset = paramDefRegEx.indexIn(line, offset)) != -1 )
-          {
-              offset += paramDefRegEx.matchedLength();
+        file.close();
 
-              QStringList split = paramDefRegEx.cap(0).split(QRegExp("\\s"));
-
-              if(counter == 0)
-              {
-                  funcJson["name"] = split[1].toUpper();;
-                  funcJson["returnType"] = split[0].toUpper();
-                  funcJson["category"] = categoryName;
-                  funcJson["isBoolType"] = QString("0");
-                  funcJson["isVoidType"] = QString("0");
-                  if(!funcJson["returnType"].toString().compare("BOOL"))
-                      funcJson["isBoolType"] = QString("1");
-                  if(!funcJson["returnType"].toString().compare("VOID"))
-                      funcJson["isVoidType"] = QString("1");
-              }
-              else if(counter == 1)
-              {
-
-              }
-              else
-              {
-                  QJsonObject arg;
-                  arg["name"] = split[1].toUpper();
-                  arg["type"] = split[0].toUpper();
-                  arg["value"] = QString("");
-                  funcArgsJson.append(arg);
-              }
-
-              counter++;
-          }
-
-          funcJson["args"] = funcArgsJson;
-
-          if(funcJson["name"].toString().length()>0)
-              functions.append(funcJson);
-            //emit this->onParseNewFunctionBlock(funcJson);
-        }
+        emit onParseSuccess();
     }
-
-    QJsonObject constJson;
-    constJson["name"] = QString("UCONST");
-    constJson["type"] = QString("UINT");
-    constJson["returnType"] = QString("UINT");
-    constJson["category"] = QString("CONSTS");
-
-    //emit onParseNewConstType(constJSon);
-    constTypes.append(constJson);
-
-    resultJson["variable_types"] = varTypes;
-    resultJson["const_types"] = constTypes;
-    resultJson["functions"] = functions;
-
-    file.close();
 
     return resultJson;
 }
@@ -125,6 +129,7 @@ bool
 ParsePlugin::
 compile(QJsonObject program, QString path)
 {
+    bool errors = false;
     QFile hfile( path + "/variables.h" );
     if ( hfile.open(QIODevice::WriteOnly) )
     {
@@ -158,8 +163,8 @@ compile(QJsonObject program, QString path)
     }
     else
     {
-        emit this->onErrorMessage(QString("ParsePlugin: compilation error (1)"));
-        return false;
+        emit this->onErrorMessage(QString("ParsePlugin: compilation error #1"));
+        errors = true;
     }
 
     //generate max definition file
@@ -174,8 +179,8 @@ compile(QJsonObject program, QString path)
     }
     else
     {
-        emit this->onErrorMessage(QString("ParsePlugin: compilation error (2)"));
-        return false;
+        emit this->onErrorMessage(QString("ParsePlugin: compilation error #2"));
+        errors = true;
     }
 
     QFile cfile( path + "/variables.c" );
@@ -194,8 +199,8 @@ compile(QJsonObject program, QString path)
     }
     else
     {
-        emit this->onErrorMessage(QString("ParsePlugin: compilation error (3)"));
-        return false;
+        emit this->onErrorMessage(QString("ParsePlugin: compilation error #3"));
+        errors = true;
     }
 
     QFile pfile( path + "/program.c" );
@@ -223,9 +228,20 @@ compile(QJsonObject program, QString path)
     }
     else
     {
-        emit this->onErrorMessage(QString("ParsePlugin: compilation error (4)"));
-        return false;
+        emit this->onErrorMessage(QString("ParsePlugin: compilation error #4"));
+        errors = true;
+
     }
+
+    if(errors)
+    {
+        emit onCompileFail();
+    }
+    else
+    {
+        emit onCompileSuccess();
+    }
+
     return true;
 }
 
