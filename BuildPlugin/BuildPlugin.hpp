@@ -33,10 +33,13 @@ signals:
 
     void onErrorMessage(QString message) override;
     void onInfoMessage(QString message) override;
+    void onBuildSuccess() override;
+    void onBuildFail() override;
 
 private:
 
     QProcess process;
+    bool errors;
 
 };
 

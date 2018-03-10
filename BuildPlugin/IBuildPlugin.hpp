@@ -14,6 +14,8 @@ public:
     virtual bool build(QJsonObject buildInfo) = 0;
     virtual void onInfoMessage(QString message) = 0;
     virtual void onErrorMessage(QString message) = 0;
+    virtual void onBuildSuccess() = 0;
+    virtual void onBuildFail() = 0;
 };
 
 Q_DECLARE_INTERFACE(IBuildPlugin, "IBuildPlugin")
