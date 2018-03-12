@@ -1,5 +1,6 @@
 #include "functions.h"
 #include "program.h"
+#include "crc32.h"
 
 volatile UINT adcResults[ADC_CHANNELS];
 volatile UINT adcIsrChnl=0;
@@ -37,42 +38,42 @@ void init()
 
 void DO1(UINT id, BOOL out){
         SET_PIN(PORTD, 5, out);
-	_data[id] = out;
+        _data[id] = out;
 }
 
 void DO2(UINT id, BOOL out){
         SET_PIN(PORTD, 6, out);
-	_data[id] = out;
+        _data[id] = out;
 }
 
 void DO3(UINT id, BOOL out){
         SET_PIN(PORTD, 7, out);
-	_data[id] = out;
+        _data[id] = out;
 }
 
 void DO4(UINT id, BOOL out){
         SET_PIN(PORTB, 0, out);
-	_data[id] = out;
+        _data[id] = out;
 }
 
 void DO5(UINT id, BOOL out){
         SET_PIN(PORTB, 1, out);
-	_data[id] = out;
+        _data[id] = out;
 }
-	
+
 BOOL DI1(UINT id){
-	_data[id] = GET_PIN(PIND, 2);
-	return _data[id];
+        _data[id] = GET_PIN(PIND, 2);
+        return _data[id];
 }
 
 BOOL DI2(UINT id){
-	_data[id] = GET_PIN(PIND, 3);
-	return _data[id];
+        _data[id] = GET_PIN(PIND, 3);
+        return _data[id];
 }
 
 BOOL DI3(UINT id){
-	_data[id] = GET_PIN(PIND, 4);
-	return _data[id];
+        _data[id] = GET_PIN(PIND, 4);
+        return _data[id];
 }
 
 UINT AI1(UINT id){
@@ -105,7 +106,7 @@ BOOL TMR(UINT id, UINT time, BOOL reset)
         if(!IS_PARAM_SET(_data[id], TIMER_ON))
         {
                 _data[id] |= TIMER_ON | time;
-	}
+        }
         else
         {
                 if((reset & 0x01) == 1)
@@ -113,7 +114,7 @@ BOOL TMR(UINT id, UINT time, BOOL reset)
                     _data[id] = 0;
                     _data[id] |= TIMER_ON | time;
                     USART_WriteChar('r');
-		}
+                }
 
                 if((int)_data[id] <= 0)
                 {
@@ -127,18 +128,18 @@ BOOL TMR(UINT id, UINT time, BOOL reset)
                     _data[id] = _data[id] - dtime;
                 }
 
-	}
+        }
         return 0;
 }
 
 BOOL FLIP(UINT id, BOOL set, BOOL reset)
 {
-	if(set==1 && reset==0){
+        if(set==1 && reset==0){
                 _data[id]=1;
-	}
-	if(reset==1){
+        }
+        if(reset==1){
                 _data[id]=0;
-	}
+        }
         return _data[id];
 }
 
@@ -167,43 +168,43 @@ UINT CNT(UINT id, BOOL pulse, BOOL reset)
             {
                 _data[id]++;
             }
-	}
+        }
         if((reset & 0x01) == 1)
         {
                 _data[id]=0;
-	}
+        }
         return _data[id];
 }
 
 void SND(UINT id, BOOL pulse, INT val){
-	if((pulse & 0x01)==1){
-		USART_WriteInt(val);
-		USART_WriteChar('\r');
-	}
+        if((pulse & 0x01)==1){
+                USART_WriteInt(val);
+                USART_WriteChar('\r');
+        }
 }
 
 INT CGT(UINT id, INT a, INT b){
-	return a>b;
+        return a>b;
 }
 
 INT CLT(UINT id, INT a, INT b){
-	return a<b;
+        return a<b;
 }
 
 INT CEQ(UINT id, INT a, INT b){
-	return (a==b)?1:0;
+        return (a==b)?1:0;
 }
 
 BOOL AND(UINT id, BOOL a, BOOL b){
-	return (a & 0x01) & (b & 0x01);
+        return (a & 0x01) & (b & 0x01);
 }
 
 BOOL OR(UINT id, BOOL a, BOOL b){
-	return (a & 0x01) | (b & 0x01);
+        return (a & 0x01) | (b & 0x01);
 }
 
 BOOL NOT(UINT id, BOOL a){
-	return !(a & 0x01);
+        return !(a & 0x01);
 }
 
 /* Timer0 overflow interrupt */
@@ -217,7 +218,7 @@ ISR (TIMER0_OVF_vect)
                 if(IS_PARAM_SET(TMR_FUNC_DATA[i], TIMER_ON) && TMR_FUNC_VALUE[i]>0)
                 {
                         TMR_FUNC_VALUE[i]--;
-		}
+                }
         }
         */
         time++;
@@ -234,8 +235,8 @@ ISR(ADC_vect)
     }
 
     ADMUX = (1<<REFS0) | (adcIsrChnl & 0b00001111);
-	
-    // Start the next conversion.    
+
+    // Start the next conversion.
     ADCSRA |= (1<<ADSC);
 }
 
@@ -251,7 +252,13 @@ void USART_RecvInt(char data)
         uint8_t command = (serialQuery.data16[0] >> 8) & 0xFF;
         uint8_t data = (serialQuery.data16[1] >> 8) & 0xFF;
 
-        if(command == 1) //acquire value
+        if(command == 0) //acquire program checksum
+        {
+            serialResponse.data32 = CHECKSUM;
+            int i;
+            for(i=3;i>=0;i--)USART_WriteChar(serialResponse.buffer[i]);
+        }
+        else if(command == 1) //acquire value
         {
             if(data < (uint8_t)MAX_DATA)
             {

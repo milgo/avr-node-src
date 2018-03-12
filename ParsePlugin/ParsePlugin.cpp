@@ -167,6 +167,22 @@ compile(QJsonObject program, QString path)
         errors = true;
     }
 
+    //generate crc32 definition file
+    QFile crcfile( path + "/crc32.h" );
+    if ( crcfile.open(QIODevice::WriteOnly) )
+    {
+        QTextStream stream( &crcfile );
+        stream << "#ifndef _CRC32_H_" << "\r\n";
+        stream << "#define _CRC32_H_" << "\r\n\r\n";
+        stream << "#define CHECKSUM 0x" << program["crc32"].toString().toLatin1() << "\r\n";
+        stream << "\r\n#endif" << "\r\n";
+    }
+    else
+    {
+        emit this->onErrorMessage(QString("ParsePlugin: compilation error #2"));
+        errors = true;
+    }
+
     //generate max definition file
     QFile mfile( path + "/max.h" );
     if ( mfile.open(QIODevice::WriteOnly) )
@@ -179,7 +195,7 @@ compile(QJsonObject program, QString path)
     }
     else
     {
-        emit this->onErrorMessage(QString("ParsePlugin: compilation error #2"));
+        emit this->onErrorMessage(QString("ParsePlugin: compilation error #3"));
         errors = true;
     }
 
@@ -199,7 +215,7 @@ compile(QJsonObject program, QString path)
     }
     else
     {
-        emit this->onErrorMessage(QString("ParsePlugin: compilation error #3"));
+        emit this->onErrorMessage(QString("ParsePlugin: compilation error #4"));
         errors = true;
     }
 
@@ -228,7 +244,7 @@ compile(QJsonObject program, QString path)
     }
     else
     {
-        emit this->onErrorMessage(QString("ParsePlugin: compilation error #4"));
+        emit this->onErrorMessage(QString("ParsePlugin: compilation error #5"));
         errors = true;
 
     }
