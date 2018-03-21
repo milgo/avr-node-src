@@ -1,21 +1,30 @@
 #include "setup.h"
 
-void setup(){
-	/* Setup outputs */
-	DDRD |= _BV(5) | _BV(6) | _BV(7);
+void setup()
+{
+        /* Setup DO outputs */
+        DDRC |= _BV(2) | _BV(3) | _BV(4) |_BV(5);
 	//PORTD &= ~_BV(5) & ~_BV(6) & ~_BV(7); //SOURCE 
-	PORTD |= _BV(5) | _BV(6) | _BV(7); //SINK
-	DDRB |= _BV(0) | _BV(1);
-	//PORTB &= ~_BV(0) & ~_BV(1); //SOURCE
-	PORTB |=  _BV(0) |  _BV(1); //SINK
+        PORTC |= _BV(2) | _BV(3) | _BV(4) |_BV(5); //SINK
+
+        /* Setup AO outputs */
+        DDRB |= _BV(1) | _BV(2);
+        /* Setup PWM - TIMER1 */
+        TCCR1A |= (1<<WGM10); // Fast PWM 8bit
+        TCCR1B |= (1<<WGM12);
+        TCCR1A |= (1<<COM1A1)|(1<<COM1B1); //Clear OC1A/OC1B on Compare Match, set OC1A/OC1B at BOTTOM
+        TCCR1B |= (1<<CS10)|(1<<CS11); // Preksaler = 64  fpwm = 976,5Hz
+        OCR1A = 0; // Channel A = 0
+        OCR1B = 0; // Channel B = 0
 
 	/* Setup inputs */
-	DDRD &= /*~_BV(0) & ~_BV(1) &*/ ~_BV(2) & ~_BV(3) & ~_BV(4);
+        DDRD &= ~_BV(2) & ~_BV(3) & ~_BV(4) & ~_BV(5) & ~_BV(6) & ~_BV(7);
 	/* Pull-up resistors */
-	PORTD |= /*_BV(0) | _BV(1) |*/ _BV(2) | _BV(3) | _BV(4); 
+        PORTD |= _BV(2) | _BV(3) | _BV(4) |_BV(5) | _BV(6) | _BV(7);
 	
 	/* Setup ADC */
-	DDRC &= ~_BV(0) & ~_BV(1) & ~_BV(2) & ~_BV(3) & ~_BV(4) & ~_BV(5);
+        DDRC &= ~_BV(0) & ~_BV(1);
+        /* AVCC with external capacitor at AREF pin */
 	ADMUX = (1<<REFS0);
 	/* Enable the ADC and set the prescaler to 128. */
         ADCSRA = (1<<ADEN) | (1<<ADIE) | (1<<ADPS2) | (1<<ADPS1) | (1<<ADPS0);

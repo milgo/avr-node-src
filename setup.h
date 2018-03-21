@@ -19,7 +19,7 @@
 
 #define TIMER_ON 0x80000000
 
-#define ADC_CHANNELS 6
+#define ADC_CHANNELS 2
 
 	void init(void);
 	void setup(void);

@@ -37,27 +37,22 @@ void init()
 }
 
 void DO1(UINT id, BOOL out){
-        SET_PIN(PORTD, 5, out);
+        SET_PIN(PORTC, 2, out);
         _data[id] = out;
 }
 
 void DO2(UINT id, BOOL out){
-        SET_PIN(PORTD, 6, out);
+        SET_PIN(PORTC, 3, out);
         _data[id] = out;
 }
 
 void DO3(UINT id, BOOL out){
-        SET_PIN(PORTD, 7, out);
+        SET_PIN(PORTC, 4, out);
         _data[id] = out;
 }
 
 void DO4(UINT id, BOOL out){
-        SET_PIN(PORTB, 0, out);
-        _data[id] = out;
-}
-
-void DO5(UINT id, BOOL out){
-        SET_PIN(PORTB, 1, out);
+        SET_PIN(PORTC, 5, out);
         _data[id] = out;
 }
 
@@ -76,24 +71,43 @@ BOOL DI3(UINT id){
         return _data[id];
 }
 
+BOOL DI4(UINT id){
+        _data[id] = GET_PIN(PIND, 5);
+        return _data[id];
+}
+
+BOOL DI5(UINT id){
+        _data[id] = GET_PIN(PIND, 6);
+        return _data[id];
+}
+
+BOOL DI6(UINT id){
+        _data[id] = GET_PIN(PIND, 7);
+        return _data[id];
+}
+
 UINT AI1(UINT id){
-    return adcResults[0];
+    _data[id] = adcResults[0];
+    return _data[id];
 }
 
 UINT AI2(UINT id){
-    return adcResults[1];
+    _data[id] = adcResults[1];
+    return _data[id];
 }
 
-UINT AI3(UINT id){
-    return adcResults[2];
+void AO1(UINT id, UINT out){
+    _data[id] = out;
+    if(out<0)out=0;
+    if(out>255)out=255;
+    OCR1A = out;
 }
 
-UINT AI4(UINT id){
-    return adcResults[3];
-}
-
-UINT AI5(UINT id){
-    return adcResults[4];
+void AO2(UINT id, UINT out){
+    _data[id] = out;
+    if(out<0)out=0;
+    if(out>255)out=255;
+    OCR1B = out;
 }
 
 UINT UCONST(UINT cnst){

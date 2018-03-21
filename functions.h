@@ -21,17 +21,19 @@ volatile uint32_t _data[MAX_DATA];
 /*OUTPUT*/ void DO2(UINT id, BOOL out);
 /*OUTPUT*/ void DO3(UINT id, BOOL out);
 /*OUTPUT*/ void DO4(UINT id, BOOL out);
-/*OUTPUT*/ void DO5(UINT id, BOOL out);
 
 /*INPUT*/ BOOL DI1(UINT id);
 /*INPUT*/ BOOL DI2(UINT id);
 /*INPUT*/ BOOL DI3(UINT id);
+/*INPUT*/ BOOL DI4(UINT id);
+/*INPUT*/ BOOL DI5(UINT id);
+/*INPUT*/ BOOL DI6(UINT id);
 
 /*INPUT*/ UINT AI1(UINT id);
 /*INPUT*/ UINT AI2(UINT id);
-/*INPUT*/ UINT AI3(UINT id);
-/*INPUT*/ UINT AI4(UINT id);
-/*INPUT*/ UINT AI5(UINT id);
+
+/*OUTPUT*/ void AO1(UINT id, UINT out);
+/*OUTPUT*/ void AO2(UINT id, UINT out);
 
 /*FUNCTION*/ BOOL FLIP(UINT id, BOOL set, BOOL reset);
 /*FUNCTION*/ BOOL TMR(UINT id, UINT time, BOOL reset);
