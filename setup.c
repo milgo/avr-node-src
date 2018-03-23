@@ -3,9 +3,8 @@
 void setup()
 {
         /* Setup DO outputs */
-        DDRC |= _BV(2) | _BV(3) | _BV(4) |_BV(5);
-	//PORTD &= ~_BV(5) & ~_BV(6) & ~_BV(7); //SOURCE 
-        PORTC |= _BV(2) | _BV(3) | _BV(4) |_BV(5); //SINK
+        //DDRC and PORTC register is all zeros after reset HI-Z
+        //Setting DDRC bit to one makes PORTC pin output sink
 
         /* Setup AO outputs */
         DDRB |= _BV(1) | _BV(2);

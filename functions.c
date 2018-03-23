@@ -37,52 +37,52 @@ void init()
 }
 
 void DO1(UINT id, BOOL out){
-        SET_PIN(PORTC, 2, out);
+        SET_BIT(DDRC, 2, out);
         _data[id] = out;
 }
 
 void DO2(UINT id, BOOL out){
-        SET_PIN(PORTC, 3, out);
+        SET_BIT(DDRC, 3, out);
         _data[id] = out;
 }
 
 void DO3(UINT id, BOOL out){
-        SET_PIN(PORTC, 4, out);
+        SET_BIT(DDRC, 4, out);
         _data[id] = out;
 }
 
 void DO4(UINT id, BOOL out){
-        SET_PIN(PORTC, 5, out);
+        SET_BIT(DDRC, 5, out);
         _data[id] = out;
 }
 
 BOOL DI1(UINT id){
-        _data[id] = GET_PIN(PIND, 2);
+        _data[id] = GET_BIT(PIND, 2);
         return _data[id];
 }
 
 BOOL DI2(UINT id){
-        _data[id] = GET_PIN(PIND, 3);
+        _data[id] = GET_BIT(PIND, 3);
         return _data[id];
 }
 
 BOOL DI3(UINT id){
-        _data[id] = GET_PIN(PIND, 4);
+        _data[id] = GET_BIT(PIND, 4);
         return _data[id];
 }
 
 BOOL DI4(UINT id){
-        _data[id] = GET_PIN(PIND, 5);
+        _data[id] = GET_BIT(PIND, 5);
         return _data[id];
 }
 
 BOOL DI5(UINT id){
-        _data[id] = GET_PIN(PIND, 6);
+        _data[id] = GET_BIT(PIND, 6);
         return _data[id];
 }
 
 BOOL DI6(UINT id){
-        _data[id] = GET_PIN(PIND, 7);
+        _data[id] = GET_BIT(PIND, 7);
         return _data[id];
 }
 
