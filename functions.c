@@ -57,32 +57,32 @@ void DO4(UINT id, BOOL out){
 }
 
 BOOL DI1(UINT id){
-        _data[id] = GET_BIT(PIND, 2);
+        _data[id] = !GET_BIT(PIND, 2);
         return _data[id];
 }
 
 BOOL DI2(UINT id){
-        _data[id] = GET_BIT(PIND, 3);
+        _data[id] = !GET_BIT(PIND, 3);
         return _data[id];
 }
 
 BOOL DI3(UINT id){
-        _data[id] = GET_BIT(PIND, 4);
+        _data[id] = !GET_BIT(PIND, 4);
         return _data[id];
 }
 
 BOOL DI4(UINT id){
-        _data[id] = GET_BIT(PIND, 5);
+        _data[id] = !GET_BIT(PIND, 5);
         return _data[id];
 }
 
 BOOL DI5(UINT id){
-        _data[id] = GET_BIT(PIND, 6);
+        _data[id] = !GET_BIT(PIND, 6);
         return _data[id];
 }
 
 BOOL DI6(UINT id){
-        _data[id] = GET_BIT(PIND, 7);
+        _data[id] = !GET_BIT(PIND, 7);
         return _data[id];
 }
 
