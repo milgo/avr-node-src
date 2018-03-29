@@ -275,7 +275,7 @@ compileNode(QJsonArray program, QJsonArray variables, QJsonObject root)
         foreach (const QJsonValue & var, variables)
         {
             if(!var["name"].toString().compare(root["name"].toString())){
-                varType = var["type"].toString();
+                varType = var["returnType"].toString();
                 break;
             }
         }
@@ -309,7 +309,7 @@ compileNode(QJsonArray program, QJsonArray variables, QJsonObject root)
             foreach (const QJsonValue & var, variables)
             {
                 if(!var["name"].toString().compare(paramSplit.at(1))){
-                    varType = var["type"].toString();
+                    varType = var["returnType"].toString();
                     break;
                 }
             }
