@@ -26,10 +26,11 @@ DownloadPlugin::
 download(QJsonObject downloadInfo)
 {
     QString workingDir = downloadInfo["file_directory"].toString();
-    QString fileName = downloadInfo["file_name"].toString();
-    QString comPort = downloadInfo["com_port"].toString();
+    //QString fileName = downloadInfo["file_name"].toString();
+    //QString comPort = downloadInfo["com_port"].toString();
     process.setWorkingDirectory(workingDir);
-    process.start("avrdude -c arduino -p m8 -P "+comPort.toLatin1()+" -b 115200 -U flash:w:\""+fileName.toLatin1()+"\":a");
+    process.start(downloadInfo["download_command"].toString());
+    //process.start("avrdude -c arduino -p m8 -P "+comPort.toLatin1()+" -b 115200 -U flash:w:\""+fileName.toLatin1()+"\":a");
     errors = false;
     return true;
 }
