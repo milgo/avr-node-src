@@ -1,6 +1,15 @@
 cmake_minimum_required(VERSION 3.2)
 
-project(ParsePlugin)
+set(TARGET_NAME ParsePlugin)
+
+project(${TARGET_NAME})
+
+if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+  set(ARCHITECTURE_BITS "x64")
+ else()
+  set(ARCHITECTURE_BITS "i386")
+endif()
+
 add_definitions(-DPARSEPLUGIN_LIBRARY)
 
 set(CMAKE_AUTOMOC ON)
@@ -11,13 +20,15 @@ find_package(Qt5 COMPONENTS
 
 add_definitions(${Qt5Widgets_DEFINITIONS})
 
-add_library(ParsePlugin SHARED ParsePlugin.cpp)
+add_library(${TARGET_NAME} SHARED ParsePlugin.cpp)
 
-install(TARGETS ParsePlugin DESTINATION lib)
-install(FILES ParsePlugin DESTINATION ./)
+install(TARGETS ${TARGET_NAME} DESTINATION lib)
+install(FILES ${TARGET_NAME} DESTINATION ./)
 
-target_link_libraries(ParsePlugin Qt5::Core)
+target_link_libraries(${TARGET_NAME} Qt5::Core)
 
-add_custom_command(TARGET ParsePlugin
+set_target_properties(${TARGET_NAME} PROPERTIES OUTPUT_NAME "${TARGET_NAME}-${CMAKE_SYSTEM_NAME}-${ARCHITECTURE_BITS}")
+
+add_custom_command(TARGET ${TARGET_NAME}
                    POST_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:ParsePlugin> "${CMAKE_CURRENT_SOURCE_DIR}")
