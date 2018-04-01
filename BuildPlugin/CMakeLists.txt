@@ -1,14 +1,15 @@
 cmake_minimum_required(VERSION 3.2)
 
-if("${CMAKE_SIZEOF_VOID_P}" EQUAL "8")
+set(TARGET_NAME BuildPlugin)
+
+project(${TARGET_NAME})
+
+if(CMAKE_SIZEOF_VOID_P EQUAL 8)
   set(ARCHITECTURE_BITS "x64")
  else()
   set(ARCHITECTURE_BITS "i386")
 endif()
 
-set(TARGET_NAME BuildPlugin)
-
-project(${TARGET_NAME})
 add_definitions(-DBUILDPLUGIN_LIBRARY)
 
 set(CMAKE_AUTOMOC ON)
