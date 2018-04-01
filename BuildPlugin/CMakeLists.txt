@@ -1,6 +1,14 @@
 cmake_minimum_required(VERSION 3.2)
 
-project(BuildPlugin)
+if("${CMAKE_SIZEOF_VOID_P}" EQUAL "8")
+  set(ARCHITECTURE_BITS "x64")
+ else()
+  set(ARCHITECTURE_BITS "i386")
+endif()
+
+set(TARGET_NAME BuildPlugin)
+
+project(${TARGET_NAME})
 add_definitions(-DBUILDPLUGIN_LIBRARY)
 
 set(CMAKE_AUTOMOC ON)
@@ -11,12 +19,14 @@ find_package(Qt5 COMPONENTS
 
 add_definitions(${Qt5Widgets_DEFINITIONS})
 
-add_library(BuildPlugin SHARED BuildPlugin.cpp)
+add_library(${TARGET_NAME} SHARED BuildPlugin.cpp)
 
-install(TARGETS BuildPlugin DESTINATION lib)
-install(FILES BuildPlugin DESTINATION ./)
+install(TARGETS ${TARGET_NAME} DESTINATION lib)
+install(FILES ${TARGET_NAME} DESTINATION ./)
 
-target_link_libraries(BuildPlugin Qt5::Core)
+target_link_libraries(${TARGET_NAME} Qt5::Core)
+
+set_target_properties(${TARGET_NAME} PROPERTIES OUTPUT_NAME "${TARGET_NAME}-${CMAKE_SYSTEM_NAME}-${ARCHITECTURE_BITS}")
 
 add_custom_command(TARGET BuildPlugin
                    POST_BUILD

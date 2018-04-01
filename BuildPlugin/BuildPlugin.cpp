@@ -27,7 +27,7 @@ build(QJsonObject buildInfo)
 {
     QString workingDir = buildInfo["build_directory"].toString();
     process.setWorkingDirectory(workingDir);
-    process.start("make");
+    process.start(buildInfo["build_command"].toString());
     errors = false;
     return true;
 }
