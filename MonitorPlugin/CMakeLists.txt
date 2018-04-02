@@ -22,15 +22,8 @@ add_definitions(${Qt5Widgets_DEFINITIONS})
 
 add_library(${TARGET_NAME} SHARED MonitorPlugin.cpp)
 
-install(TARGETS ${TARGET_NAME} DESTINATION lib)
-install(FILES ${TARGET_NAME} DESTINATION ./)
-
 target_link_libraries(${TARGET_NAME} Qt5::Core)
 
 qt5_use_modules(${TARGET_NAME} SerialPort)
 
 set_target_properties(${TARGET_NAME} PROPERTIES OUTPUT_NAME "${TARGET_NAME}-${CMAKE_SYSTEM_NAME}-${ARCHITECTURE_BITS}")
-
-add_custom_command(TARGET ${TARGET_NAME}
-                   POST_BUILD
-                   COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:MonitorPlugin> "${CMAKE_CURRENT_SOURCE_DIR}")
