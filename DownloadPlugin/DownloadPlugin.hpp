@@ -8,7 +8,7 @@
 #include "DownloadPlugin_global.hpp"
 #include "IDownloadPlugin.hpp"
 
-class DOWNLOADPLUGINSHARED_EXPORT DownloadPlugin: public QObject, IDownloadPlugin
+class DOWNLOADPLUGINSHARED_EXPORT DownloadPlugin : public QObject, IDownloadPlugin
 {
 
     Q_OBJECT
