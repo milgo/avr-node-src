@@ -270,14 +270,17 @@ void USART_RecvInt(char data)
         {
             serialResponse.data32 = CHECKSUM;
             int i;
+            for(i=3;i>=0;i--)USART_WriteChar(0x00);
             for(i=3;i>=0;i--)USART_WriteChar(serialResponse.buffer[i]);
         }
         else if(command == 1) //acquire value
         {
             if(data < (uint8_t)MAX_DATA)
             {
-                serialResponse.data32 = _data[data];
+                serialResponse.data32 = 0x01;
                 int i;
+                for(i=3;i>=0;i--)USART_WriteChar(serialResponse.buffer[i]);
+                serialResponse.data32 = _data[data];
                 for(i=3;i>=0;i--)USART_WriteChar(serialResponse.buffer[i]);
             }
         }

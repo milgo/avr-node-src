@@ -8,6 +8,7 @@
 #include <QtCore/QObject>
 #include <QtSerialPort/QSerialPort>
 #include <QTimer>
+#include <QDataStream>
 
 #include "MonitorPlugin_global.hpp"
 #include "IMonitorPlugin.hpp"
@@ -36,10 +37,16 @@ public:
     bool
     isConnected() override;
 
+    void
+    acquireProgramChecksum();
+
 signals:
 
     void
     valueAcquired(QString id, QByteArray value) override;
+
+    void
+    programChecksumAcquired(QByteArray value);
 
     void
     onInfoMessage(QString message) override;

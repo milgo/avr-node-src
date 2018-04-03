@@ -61,14 +61,45 @@ MonitorPlugin
 ::reciveData()
 {
     readData.append(serialPort.readAll());
-    while(readData.size()>=4)
+    while(readData.size()>=8)
     {
+        QByteArray response = readData.left(4);
+        readData.remove(0,4);
         QByteArray data = readData.left(4);
         readData.remove(0,4);
-        QString id = variablesStack.front();
-        variablesStack.pop();
-        emit valueAcquired(id, data);
+
+        QDataStream ds(response);
+        uint res = -1;
+        ds>>res;
+
+        switch(res)
+        {
+        case 0:{
+            emit programChecksumAcquired(data);
+            break;
+        }
+        case 1:{
+            QString id = variablesStack.front();
+            variablesStack.pop();
+            emit valueAcquired(id, data);
+            break;
+        }
+        }
     }
+}
+
+void
+MonitorPlugin
+::acquireProgramChecksum()
+{
+    QByteArray data;
+
+    data.append((char)0);
+    data.append((char)0);
+    data.append((char)0);
+    data.append((char)0);
+
+    write(data);
 }
 
 void
