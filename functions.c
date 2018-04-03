@@ -263,8 +263,12 @@ void USART_RecvInt(char data)
     {
         bufferCounter=0;
 
-        uint8_t command = (serialQuery.data16[0] >> 8) & 0xFF;
-        uint8_t data = (serialQuery.data16[1] >> 8) & 0xFF;
+        uint16_t param = (serialQuery.data16[0]);
+        uint16_t command = (serialQuery.data16[1]);
+
+        //USART_WriteChar('.');
+        //USART_WriteInt(command);
+        //USART_WriteInt(data);
 
         if(command == 0) //acquire program checksum
         {
@@ -277,10 +281,11 @@ void USART_RecvInt(char data)
         {
             if(data < (uint8_t)MAX_DATA)
             {
-                serialResponse.data32 = 0x01;
                 int i;
+                serialResponse.data16[0] = 0x01;
+                serialResponse.data16[1] = param;
                 for(i=3;i>=0;i--)USART_WriteChar(serialResponse.buffer[i]);
-                serialResponse.data32 = _data[data];
+                serialResponse.data32 = _data[param];
                 for(i=3;i>=0;i--)USART_WriteChar(serialResponse.buffer[i]);
             }
         }

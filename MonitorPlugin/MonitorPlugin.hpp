@@ -71,14 +71,19 @@ private slots:
     handleWriteTimeout();
 
     void
+    handleWriteTimer();
+
+    void
     handleError(QSerialPort::SerialPortError error);
 
 private:
 
     QSerialPort serialPort;
+    QTimer writeTimeoutTimer;
     QTimer writeTimer;
 
     std::queue<QString> variablesStack;
+    QList<QByteArray> dataToSend;
 
     QByteArray writeData;
     QByteArray readData;

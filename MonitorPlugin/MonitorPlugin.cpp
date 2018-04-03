@@ -7,11 +7,13 @@
 MonitorPlugin::
 MonitorPlugin()
 {
-    writeTimer.setSingleShot(true);
+    writeTimeoutTimer.setSingleShot(true);
     QObject::connect(&serialPort, &QSerialPort::readyRead, this, &MonitorPlugin::reciveData);
     QObject::connect(&serialPort, &QSerialPort::bytesWritten, this, &MonitorPlugin::handleBytesWritten);
     QObject::connect(&serialPort, &QSerialPort::errorOccurred, this, &MonitorPlugin::handleError);
-    QObject::connect(&writeTimer, &QTimer::timeout, this, &MonitorPlugin::handleWriteTimeout);
+    QObject::connect(&writeTimeoutTimer, &QTimer::timeout, this, &MonitorPlugin::handleWriteTimeout);
+    QObject::connect(&writeTimer, &QTimer::timeout, this, &MonitorPlugin::handleWriteTimer);
+    //writeTimer.start(500);
 }
 
 QObject*
@@ -30,9 +32,10 @@ MonitorPlugin
 
     if (!serialPort.open(QIODevice::ReadWrite))
     {
-        emit onInfoMessage("Device connected...");
         return false;
     }
+    emit onInfoMessage("Device connected...");
+    writeTimer.start(500);
     return true;
 }
 
@@ -44,6 +47,7 @@ MonitorPlugin
     {
         serialPort.close();
         emit onInfoMessage("Device disconnected...");
+        writeTimer.stop();
         return true;
     }
     return false;
@@ -61,6 +65,7 @@ MonitorPlugin
 ::reciveData()
 {
     readData.append(serialPort.readAll());
+    qDebug("recive="+readData.toHex());
     while(readData.size()>=8)
     {
         QByteArray response = readData.left(4);
@@ -72,20 +77,24 @@ MonitorPlugin
         uint res = -1;
         ds>>res;
 
-        switch(res)
+        uint returnCode = res & 0x0000FFFF;
+        uint returnId = (res & 0xFFFF0000) >> 16;
+
+        qDebug(QString("response code(" +QString::number(returnCode)+"), id("+QString::number(returnId)+")").toUtf8());
+
+        switch(returnCode)
         {
         case 0:{
             emit programChecksumAcquired(data);
             break;
         }
         case 1:{
-            QString id = variablesStack.front();
-            variablesStack.pop();
-            emit valueAcquired(id, data);
+            emit valueAcquired(QString::number(returnId), data);
             break;
         }
         }
     }
+    //readData.clear();
 }
 
 void
@@ -99,7 +108,7 @@ MonitorPlugin
     data.append((char)0);
     data.append((char)0);
 
-    write(data);
+    dataToSend.append(data);
 }
 
 void
@@ -109,13 +118,14 @@ MonitorPlugin
     QByteArray data;
     unsigned int n = id.toInt();
 
-    data.append((char)0);
-    data.append((char)1);
-    data.append((char)((n & 0xFF00) >> 8));
     data.append((char)(n & 0x00FF));
+    data.append((char)((n & 0xFF00) >> 8));
+    data.append((char)1);
+    data.append((char)0);
 
-    write(data);
-    variablesStack.push(id);
+    qDebug("sending="+data.toHex());
+
+    dataToSend.append(data);
 }
 
 void
@@ -136,7 +146,7 @@ MonitorPlugin
                              .arg(serialPort.errorString()));
     }
 
-    this->writeTimer.start(5000);
+    this->writeTimeoutTimer.start(5000);
 }
 
 void
@@ -148,7 +158,7 @@ MonitorPlugin
     {
         this->bytesWritten = 0;
         this->writeData.clear();
-        writeTimer.stop();
+        writeTimeoutTimer.stop();
     }
 }
 
@@ -159,6 +169,17 @@ MonitorPlugin
     emit onErrorMessage(QObject::tr("Operation timed out for port %1, error: %2")
                          .arg(serialPort.portName())
                          .arg(serialPort.errorString()));
+}
+
+void
+MonitorPlugin
+::handleWriteTimer()
+{
+    if(dataToSend.size() > 0)
+    {
+        write(dataToSend.first());
+        dataToSend.removeFirst();
+    }
 }
 
 void
