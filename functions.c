@@ -1,6 +1,5 @@
 #include "functions.h"
 #include "program.h"
-#include "crc32.h"
 
 volatile UINT adcResults[ADC_CHANNELS];
 volatile UINT adcIsrChnl=0;
@@ -252,42 +251,4 @@ ISR(ADC_vect)
 
     // Start the next conversion.
     ADCSRA |= (1<<ADSC);
-}
-
-void USART_RecvInt(char data)
-{
-    serialQuery.buffer[bufferCounter]=data;
-
-    bufferCounter++;
-    if(bufferCounter>3)
-    {
-        bufferCounter=0;
-
-        uint16_t param = (serialQuery.data16[0]);
-        uint16_t command = (serialQuery.data16[1]);
-
-        //USART_WriteChar('.');
-        //USART_WriteInt(command);
-        //USART_WriteInt(data);
-
-        if(command == 0) //acquire program checksum
-        {
-            serialResponse.data32 = CHECKSUM;
-            int i;
-            for(i=3;i>=0;i--)USART_WriteChar(0x00);
-            for(i=3;i>=0;i--)USART_WriteChar(serialResponse.buffer[i]);
-        }
-        else if(command == 1) //acquire value
-        {
-            if(data < (uint8_t)MAX_DATA)
-            {
-                int i;
-                serialResponse.data16[0] = 0x01;
-                serialResponse.data16[1] = param;
-                for(i=3;i>=0;i--)USART_WriteChar(serialResponse.buffer[i]);
-                serialResponse.data32 = _data[param];
-                for(i=3;i>=0;i--)USART_WriteChar(serialResponse.buffer[i]);
-            }
-        }
-    }
 }

@@ -46,10 +46,3 @@ void USART_WriteString(char s[])
 		i++;
 	}
 }
-
-ISR(USART_RXC_vect)
-{
-	char byte;
-	byte=UDR;
-	USART_RecvInt(byte);
-}
