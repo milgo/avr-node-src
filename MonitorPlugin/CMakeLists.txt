@@ -14,7 +14,7 @@ find_package(Qt5 COMPONENTS
 
 add_definitions(${Qt5Widgets_DEFINITIONS})
 
-add_library(${TARGET_NAME} SHARED MonitorPlugin.cpp)
+add_library(${TARGET_NAME} SHARED MonitorPlugin.cpp hdlc_qt.cpp)
 
 target_link_libraries(${TARGET_NAME} Qt5::Core)
 

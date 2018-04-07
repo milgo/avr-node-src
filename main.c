@@ -1,12 +1,13 @@
 #include "program.h"
 #include "setup.h"
+#include "hdlc.h"
 
 #define UART_RX_CIRCLE_BUFFER_SIZE 32
 #define UART_TX_CIRCLE_BUFFER_SIZE 32
 
-#define TRUE 1
+/*#define TRUE 1
 #define FALSE 0
-#define bool uint8_t
+#define bool uint8_t*/
 
 volatile uint8_t uart_rx_write_pos = 0;
 volatile uint8_t uart_rx_read_pos = 0;
@@ -33,7 +34,8 @@ ISR(USART_RXC_vect)
 
 void on_rx_uart_circle_buffer_data(uint8_t data)
 {
-	tx_u8(data);
+	//tx_u8(data);
+	hdlc_on_rx_u8(data);
 }
 
 void read_from_uart_rx_circle_buffer(void)
@@ -144,17 +146,25 @@ void tx_u8_array(uint8_t * data, uint8_t nr_of_bytes)
     }
 }
 
+void hdlc_on_rx_frame(u8_t * data, size_t nr_of_bytes)
+{
+	hdlc_tx_frame(data, nr_of_bytes);
+	//tx_u8_array(data, nr_of_bytes);
+}
+
 int main(void)
 {
 	setup();
 	DO1(0,0);
 
-	uint8_t* test_string = "abcdefghijklmnopqrstuvwxyz|";
+	uint8_t* test_string = "hello";
+	
+	hdlc_init(&tx_u8, &hdlc_on_rx_frame);
 
     while (1)
     {
-
-		tx_u8_array(test_string, 27);
+		hdlc_tx_frame(test_string, 5);
+		//tx_u8_array(test_string, 27);
 		//_delay_ms(100);
 
         loop();

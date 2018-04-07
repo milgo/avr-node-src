@@ -54,10 +54,16 @@ signals:
     void
     onErrorMessage(QString message) override;
 
+    void
+    dataReceived(QByteArray data);
+
+    void
+    sendDataFrame(QByteArray buffer, quint16 bytes_to_send);
+
 private:
 
     void
-    reciveData();
+    receiveData();
 
     void
     write(const QByteArray &writeData);
@@ -76,17 +82,24 @@ private slots:
     void
     handleError(QSerialPort::SerialPortError error);
 
+    void
+    transmitByte(char data);
+
+    void
+    transmitByte(QByteArray data);
+
+    void
+    commandRouter(QByteArray buffer, quint16 bytes_received);
+
 private:
 
     QSerialPort serialPort;
     QTimer writeTimeoutTimer;
     QTimer writeTimer;
 
-    std::queue<QString> variablesStack;
     QList<QByteArray> dataToSend;
 
     QByteArray writeData;
-    QByteArray readData;
 
     qint64 bytesWritten = 0;
 };
