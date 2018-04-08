@@ -14,8 +14,6 @@ public:
     virtual bool connectToDevice(QJsonObject connectionInfo) = 0;
     virtual bool disconnectFromDevice() = 0;
     virtual bool isConnected() = 0;
-    virtual void acquireValue(QString id) = 0;
-    virtual void valueAcquired(QString id, QByteArray value) = 0;
 
     virtual void onInfoMessage(QString message) = 0;
     virtual void onErrorMessage(QString message) = 0;

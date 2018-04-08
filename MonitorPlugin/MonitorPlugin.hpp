@@ -3,6 +3,7 @@
 
 #include <QtPlugin>
 #include <QObject>
+#include <QMap>
 
 #include <queue>
 #include <QtCore/QObject>
@@ -12,6 +13,17 @@
 
 #include "MonitorPlugin_global.hpp"
 #include "IMonitorPlugin.hpp"
+
+#define LOG(str) qDebug("[MonitorPlugin]: " + QString(str).toUtf8())
+#define LOGV(str,v) qDebug("[MonitorPlugin]: " + QString(str).arg(v).toUtf8())
+
+struct DeviceDataFrame
+{
+    quint16 id;
+    quint8 command;
+    quint8 param;
+    quint32 data;
+};
 
 class MONITORPLUGINSHARED_EXPORT MonitorPlugin : public QObject, IMonitorPlugin
 {
@@ -25,9 +37,6 @@ public:
 
     QObject* getObject() override;
 
-    void
-    acquireValue(QString id) override;
-
     bool
     connectToDevice(QJsonObject connectionInfo) override;
 
@@ -38,15 +47,9 @@ public:
     isConnected() override;
 
     void
-    acquireProgramChecksum();
+    sendRequestToDevice(DeviceDataFrame request);
 
 signals:
-
-    void
-    valueAcquired(QString id, QByteArray value) override;
-
-    void
-    programChecksumAcquired(QByteArray value);
 
     void
     onInfoMessage(QString message) override;
@@ -62,6 +65,9 @@ signals:
 
     void
     sendDataFrame(QByteArray buffer, quint16 bytes_to_send);
+
+    void
+    onReplyFromDevice(DeviceDataFrame reply);
 
 private:
 
@@ -80,7 +86,10 @@ private slots:
     handleWriteTimeout();
 
     void
-    handleWriteTimer();
+    handleWriteTimerTimeout();
+
+    void
+    handleRepeatRequestTimeout();
 
     void
     handleError(QSerialPort::SerialPortError error);
@@ -92,7 +101,7 @@ private slots:
     transmitByte(QByteArray data);
 
     void
-    commandRouter(QByteArray buffer, quint16 bytes_received);
+    replyHandler(QByteArray buffer, quint16 bytes_received);
 
 private:
 
@@ -100,12 +109,13 @@ private:
     QTimer writeTimeoutTimer;
     QTimer writeTimer;
     QTimer startWriteTimer;
+    QTimer repeatRequestTimer;
 
     QList<QByteArray> dataToSend;
-
+    QMap<qint8, DeviceDataFrame> requestList;
     QByteArray writeData;
-
     qint64 bytesWritten = 0;
+    quint8 requestCounter = 0;
 };
 
 #endif // MONITORPLUGIN_H

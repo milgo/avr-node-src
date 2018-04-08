@@ -12,17 +12,28 @@ MonitorPlugin()
 
     QObject::connect(hdlc, qOverload<char>(&HDLC_qt::hdlcTransmitByte), this, qOverload<char>(&MonitorPlugin::transmitByte));
     QObject::connect(hdlc, qOverload<QByteArray>(&HDLC_qt::hdlcTransmitByte), this, qOverload<QByteArray>(&MonitorPlugin::transmitByte));
-    QObject::connect(hdlc, &HDLC_qt::hdlcValidFrameReceived, this, &MonitorPlugin::commandRouter);
+    QObject::connect(hdlc, &HDLC_qt::hdlcValidFrameReceived, this, &MonitorPlugin::replyHandler);
     QObject::connect(this, &MonitorPlugin::dataReceived, hdlc, &HDLC_qt::charReceiver);
     QObject::connect(this, &MonitorPlugin::sendDataFrame, hdlc, &HDLC_qt::frameDecode);
 
     writeTimeoutTimer.setSingleShot(true);
     startWriteTimer.setSingleShot(true);
+
     QObject::connect(&serialPort, &QSerialPort::readyRead, this, &MonitorPlugin::receiveData);
     QObject::connect(&serialPort, &QSerialPort::bytesWritten, this, &MonitorPlugin::handleBytesWritten);
     QObject::connect(&serialPort, &QSerialPort::errorOccurred, this, &MonitorPlugin::handleError);
+
     QObject::connect(&writeTimeoutTimer, &QTimer::timeout, this, &MonitorPlugin::handleWriteTimeout);
-    QObject::connect(&writeTimer, &QTimer::timeout, this, &MonitorPlugin::handleWriteTimer);
+    QObject::connect(&writeTimer, &QTimer::timeout, this, &MonitorPlugin::handleWriteTimerTimeout);
+    QObject::connect(&repeatRequestTimer, &QTimer::timeout, this, &MonitorPlugin::handleRepeatRequestTimeout);
+
+    QObject::connect(&startWriteTimer, &QTimer::timeout, [&](){
+        writeTimer.start(500);
+        LOG("starting writer timer");
+        repeatRequestTimer.start(1000);
+        LOG("starting repeat request timer");
+        emit onConnectedToDevice();
+    });
 }
 
 QObject*
@@ -39,6 +50,7 @@ transmitByte(char data)
     char t[1];
     t[0]=data;
     dataToSend.append(QByteArray(t, 1));
+    LOGV("sending data to queue [%1]", data);
 }
 
 void
@@ -46,26 +58,34 @@ MonitorPlugin::
 transmitByte(QByteArray data)
 {
     dataToSend.append(data);
+    LOGV("sending data to queue [%1]", QString(data.toHex()));
 }
 
 void
 MonitorPlugin::
-commandRouter(QByteArray buffer, quint16 bytes_received)
+replyHandler(QByteArray buffer, quint16 bytes_received)
 {
-    /*enum serial_responses command = static_cast<serial_responses>(buffer.at(0));
-    switch(command)
-    {
-        case RESPONSE_ERROR:            this->command_error(); break;
-        case RESPONSE_VERSION:          this->command_default(buffer, bytes_received); break;
-        case RESPONSE_BUTTON_PRESS:  	this->command_default(buffer, bytes_received); break;
-        case RESPONSE_READ_SIGNATURE:   this->response_read_signature(buffer, bytes_received); break;
-        case RESPONSE_ECHO_DATA:        this->command_default(buffer, bytes_received); break;
-        default:
-            this->command_error();
-            break;
-    }*/
+    QDataStream stream(buffer);
+    stream.setVersion(QDataStream::Qt_4_5);
+    stream.setByteOrder(QDataStream::LittleEndian);
+    DeviceDataFrame ddf;
 
-    qDebug(buffer.left(bytes_received));
+    stream >> ddf.id
+            >> ddf.command
+            >> ddf.param
+            >> ddf.data;
+
+    //remove request when there is an answer
+    for (auto it = requestList.begin(); it != requestList.end();)
+    {
+        if (it.key() == ddf.id)
+            it = requestList.erase(it);
+        else
+            ++it;
+    }
+
+    emit onReplyFromDevice(ddf);
+    LOGV("received replay with id=%1, removing from repeat request queue", ddf.id);
 }
 
 bool
@@ -75,31 +95,49 @@ MonitorPlugin
     serialPort.setPortName(connectionInfo["comPort"].toString());
     serialPort.setBaudRate(QSerialPort::Baud19200);
 
+    LOGV("connecting to device using port %1", connectionInfo["comPort"].toString());
     if (!serialPort.open(QIODevice::ReadWrite))
     {
+        LOG("connection error");
         return false;
     }
 
+    LOG("device connected");
     emit onInfoMessage("Device connected...");
-    QObject::connect(&startWriteTimer, &QTimer::timeout, [&](){
-        writeTimer.start(500);
-        emit onConnectedToDevice();
-    });
+
     startWriteTimer.start(5000);
     return true;
+}
+
+void
+MonitorPlugin
+::sendRequestToDevice(DeviceDataFrame request)
+{
+    request.id = requestCounter;
+    requestList[requestCounter] = request;
+    requestCounter++;
+    LOGV("adding request with id=%1 to queue", request.id);
 }
 
 bool
 MonitorPlugin
 ::disconnectFromDevice()
 {
+    writeTimer.stop();
+    repeatRequestTimer.stop();
+    requestList.clear();
+    dataToSend.clear();
+    writeData.clear();
+    bytesWritten = 0;
+    requestCounter = 0;
+
     if (serialPort.isOpen())
     {
         serialPort.close();
-        emit onInfoMessage("Device disconnected...");
-        writeTimer.stop();
+        LOG("device disconnected");
+        emit onInfoMessage("Device disconnected...");        
         return true;
-    }
+    }    
     return false;
 }
 
@@ -116,48 +154,14 @@ MonitorPlugin
 {
     QByteArray data = serialPort.readAll();
     emit dataReceived(data);
-}
-
-void
-MonitorPlugin
-::acquireProgramChecksum()
-{
-    /*QByteArray data;
-
-    data.append((char)0);
-    data.append((char)0);
-    data.append((char)0);
-    data.append((char)0);
-
-    dataToSend.append(data);*/
-
-
-}
-
-void
-MonitorPlugin
-::acquireValue(QString id)
-{
-    /*QByteArray data;
-    unsigned int n = id.toInt();
-
-    data.append((char)(n & 0x00FF));
-    data.append((char)((n & 0xFF00) >> 8));
-    data.append((char)1);
-    data.append((char)0);
-
-    qDebug("sending="+data.toHex());
-
-    dataToSend.append(data);*/
-
-    emit sendDataFrame(QByteArray("hello", 5), 5);
+    LOGV("received data: [%1]", QString(data.toHex()));
 }
 
 void
 MonitorPlugin
 ::write(const QByteArray &writeData)
 {
-    qDebug("writing: " + writeData.toHex());
+
     this->writeData.append(writeData);
 
     const qint64 bytesWritten = serialPort.write(writeData);
@@ -172,6 +176,8 @@ MonitorPlugin
                              .arg(serialPort.errorString()));
     }
 
+    LOGV("writing data to port [%1]", QString(writeData.toHex()));
+
     this->writeTimeoutTimer.start(5000);
 }
 
@@ -184,6 +190,7 @@ MonitorPlugin
     {
         this->bytesWritten = 0;
         this->writeData.clear();
+        LOG("all bytes sended");
         writeTimeoutTimer.stop();
     }
 }
@@ -195,16 +202,45 @@ MonitorPlugin
     emit onErrorMessage(QObject::tr("Operation timed out for port %1, error: %2")
                          .arg(serialPort.portName())
                          .arg(serialPort.errorString()));
+    LOG("write to device timeout");
 }
 
 void
 MonitorPlugin
-::handleWriteTimer()
+::handleWriteTimerTimeout()
 {
     if(dataToSend.size() > 0)
     {
+        LOGV("time to send some data from queue, writing [%1]", QString(dataToSend.first().toHex()));
         write(dataToSend.first());
         dataToSend.removeFirst();
+    }
+    else{
+        LOG("time to send some data from queue, but there isn't any");
+    }
+}
+
+void
+MonitorPlugin
+::handleRepeatRequestTimeout()
+{
+    LOG("any request to repeat?");
+    for (auto it = requestList.begin(); it != requestList.end();)
+    {
+        QByteArray byteArray;
+        DeviceDataFrame request = it.value();
+
+        QDataStream stream(&byteArray, QIODevice::WriteOnly);
+        stream.setVersion(QDataStream::Qt_4_5);
+
+        stream << request.id
+               << request.command
+               << request.param
+               << request.data;
+
+        LOGV("repeating request with id=%1", request.id);
+        emit sendDataFrame(byteArray, byteArray.size());
+        ++it;
     }
 }
 
@@ -224,4 +260,6 @@ MonitorPlugin
                             .arg(serialPort.portName())
                             .arg(serialPort.errorString()));
     }
+
+    LOGV("serial port error occured: %1", serialPortError);
 }

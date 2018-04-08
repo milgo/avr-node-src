@@ -5,9 +5,15 @@
 #define UART_RX_CIRCLE_BUFFER_SIZE 32
 #define UART_TX_CIRCLE_BUFFER_SIZE 32
 
-/*#define TRUE 1
-#define FALSE 0
-#define bool uint8_t*/
+#define U16_TO_LITTLE_ENDIAN(v) ((v & 0xFF00)) >> 8 | ((v & 0xFF) << 8)
+
+typedef struct _devicedataframe_struct
+{
+    u16_t id;
+    u8_t command;
+    u8_t param;
+    u32_t data;
+}DeviceDataFrame;
 
 volatile uint8_t uart_rx_write_pos = 0;
 volatile uint8_t uart_rx_read_pos = 0;
@@ -148,8 +154,22 @@ void tx_u8_array(uint8_t * data, uint8_t nr_of_bytes)
 
 void hdlc_on_rx_frame(u8_t * data, size_t nr_of_bytes)
 {
-	hdlc_tx_frame(data, nr_of_bytes);
 	//tx_u8_array(data, nr_of_bytes);
+	DeviceDataFrame *request = (DeviceDataFrame*)data;
+	DeviceDataFrame reply;
+
+	u16_t id = U16_TO_LITTLE_ENDIAN(request->id);
+	//u32_t data =
+
+	switch(request->command){
+		case 0x17:
+			reply.command = request->command;
+			reply.id = id;
+			reply.param = request->param;
+			reply.data = 0x6789;
+			hdlc_tx_frame((u8_t*)&reply, sizeof(DeviceDataFrame));
+			break;
+	}
 }
 
 int main(void)
@@ -157,13 +177,11 @@ int main(void)
 	setup();
 	DO1(0,0);
 
-	uint8_t* test_string = "hello";
-	
 	hdlc_init(&tx_u8, &hdlc_on_rx_frame);
 
     while (1)
     {
-		hdlc_tx_frame(test_string, 5);
+		//hdlc_tx_frame(test_string, 5);
 		//tx_u8_array(test_string, 27);
 		//_delay_ms(100);
 
