@@ -55,6 +55,9 @@ signals:
     onErrorMessage(QString message) override;
 
     void
+    onConnectedToDevice();
+
+    void
     dataReceived(QByteArray data);
 
     void
@@ -96,6 +99,7 @@ private:
     QSerialPort serialPort;
     QTimer writeTimeoutTimer;
     QTimer writeTimer;
+    QTimer startWriteTimer;
 
     QList<QByteArray> dataToSend;
 

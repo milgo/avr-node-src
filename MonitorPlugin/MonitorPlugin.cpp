@@ -17,12 +17,12 @@ MonitorPlugin()
     QObject::connect(this, &MonitorPlugin::sendDataFrame, hdlc, &HDLC_qt::frameDecode);
 
     writeTimeoutTimer.setSingleShot(true);
+    startWriteTimer.setSingleShot(true);
     QObject::connect(&serialPort, &QSerialPort::readyRead, this, &MonitorPlugin::receiveData);
     QObject::connect(&serialPort, &QSerialPort::bytesWritten, this, &MonitorPlugin::handleBytesWritten);
     QObject::connect(&serialPort, &QSerialPort::errorOccurred, this, &MonitorPlugin::handleError);
     QObject::connect(&writeTimeoutTimer, &QTimer::timeout, this, &MonitorPlugin::handleWriteTimeout);
     QObject::connect(&writeTimer, &QTimer::timeout, this, &MonitorPlugin::handleWriteTimer);
-    writeTimer.start(500);
 }
 
 QObject*
@@ -79,8 +79,13 @@ MonitorPlugin
     {
         return false;
     }
+
     emit onInfoMessage("Device connected...");
-    writeTimer.start(500);
+    QObject::connect(&startWriteTimer, &QTimer::timeout, [&](){
+        writeTimer.start(500);
+        emit onConnectedToDevice();
+    });
+    startWriteTimer.start(5000);
     return true;
 }
 
