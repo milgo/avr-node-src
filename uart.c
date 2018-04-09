@@ -112,7 +112,7 @@ bool tx_uart_circle_buffer_write(uint8_t data)
 
 bool uart_tx_byte(uint8_t data)
 {
-	DO1(0,0);
+	//DO1(0,0);
 	if(!tx_uart_circle_buffer_write(data))
 		return FALSE;
 

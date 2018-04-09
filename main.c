@@ -20,7 +20,7 @@ void on_rx_uart_circle_buffer_data(uint8_t data)
 	hdlc_on_rx_u8(data);
 }
 
-void hdlc_on_rx_frame(u8_t * data, size_t nr_of_bytes)
+void hdlc_on_rx_frame(const u8_t * data, size_t nr_of_bytes)
 {
 	DeviceDataFrame *request = (DeviceDataFrame*)data;
 	DeviceDataFrame reply;
