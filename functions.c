@@ -7,15 +7,6 @@ volatile uint32_t _data[MAX_DATA];
 volatile uint32_t time = 0;
 volatile uint32_t dtime = 0;
 
-volatile union SerialData{
-    uint32_t data32;
-    uint16_t data16[2];
-    char buffer[4];
-}serialQuery, serialResponse;
-
-volatile char buffer[4];
-volatile uint8_t bufferCounter = 0;
-
 void begin()
 {
     if(time>0)
@@ -126,14 +117,14 @@ BOOL TMR(UINT id, UINT time, BOOL reset)
                 {
                     _data[id] = 0;
                     _data[id] |= TIMER_ON | time;
-                    USART_WriteChar('r');
+                    //USART_WriteChar('r');
                 }
 
                 if((int)_data[id] <= 0)
                 {
                     _data[id] = 0;
                     _data[id] |= TIMER_ON | time;
-                    USART_WriteChar('t');
+                    //USART_WriteChar('t');
                     return 1;
                 }
                 else
@@ -191,8 +182,8 @@ UINT CNT(UINT id, BOOL pulse, BOOL reset)
 
 void SND(UINT id, BOOL pulse, INT val){
         if((pulse & 0x01)==1){
-                USART_WriteInt(val);
-                USART_WriteChar('\r');
+                //USART_WriteInt(val);
+                //USART_WriteChar('\r');
         }
 }
 

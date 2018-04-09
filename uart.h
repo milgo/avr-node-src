@@ -12,13 +12,31 @@
 #include <avr/interrupt.h>
 #include <inttypes.h>
 #include <stdlib.h>
+#include "defines.h"
 
-void USART_Init(uint16_t ubrr_value);
-void USART_WriteChar(char data);
-void USART_WriteString(char s[]);
-void USART_WriteInt(int value);
-char USART_ReadChar(void);
+#define UART_RX_CIRCLE_BUFFER_SIZE 32
+#define UART_TX_CIRCLE_BUFFER_SIZE 32
 
-extern void USART_RecvInt(char data);
+#define U16_TO_LITTLE_ENDIAN(v) ((v & 0xFF00)) >> 8 | ((v & 0xFF) << 8)
+
+typedef struct _devicedataframe_struct
+{
+    u16_t id;
+    u8_t command;
+    u8_t param;
+    u32_t data;
+}DeviceDataFrame;
+
+
+void usart_init(uint16_t ubrr_value);
+void read_from_uart_rx_circle_buffer(void);
+bool tx_uart_circle_buffer_write(uint8_t data);
+bool uart_tx_byte(uint8_t data);
+void on_rx_uart_circle_buffer_data(uint8_t data);
+
+ISR(USART_UDRE_vect);
+ISR(USART_TXC_vect);
+ISR(USART_RXC_vect);
+ISR(USART_RXC_vect);
 
 #endif 

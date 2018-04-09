@@ -28,7 +28,7 @@ void setup()
 	/* Enable the ADC and set the prescaler to 128. */
         ADCSRA = (1<<ADEN) | (1<<ADIE) | (1<<ADPS2) | (1<<ADPS1) | (1<<ADPS0);
 
-        USART_Init(51);//19200
+        usart_init(51);//19200
         _delay_ms(3000);
 
 	/* Setup time interrupt */
