@@ -28,9 +28,9 @@ MonitorPlugin()
     QObject::connect(&repeatRequestTimer, &QTimer::timeout, this, &MonitorPlugin::handleRepeatRequestTimeout);
 
     QObject::connect(&startWriteTimer, &QTimer::timeout, [&](){
-        writeTimer.start(500);
+        writeTimer.start(10);
         LOG("starting writer timer");
-        repeatRequestTimer.start(1000);
+        repeatRequestTimer.start(2000);
         LOG("starting repeat request timer");
         emit onConnectedToDevice();
     });
@@ -75,17 +75,21 @@ replyHandler(QByteArray buffer, quint16 bytes_received)
             >> ddf.param
             >> ddf.data;
 
+    LOGV("received replay with id=%1", ddf.id);
     //remove request when there is an answer
     for (auto it = requestList.begin(); it != requestList.end();)
     {
         if (it.key() == ddf.id)
+        {
+            LOGV("removing request id=%1 from repeat request queue", ddf.id);
             it = requestList.erase(it);
+        }
         else
             ++it;
     }
 
+
     emit onReplyFromDevice(ddf);
-    LOGV("received replay with id=%1, removing from repeat request queue", ddf.id);
 }
 
 bool
@@ -153,15 +157,15 @@ MonitorPlugin
 ::receiveData()
 {
     QByteArray data = serialPort.readAll();
-    emit dataReceived(data);
     LOGV("received data: [%1]", QString(data.toHex()));
+    emit dataReceived(data);
 }
 
 void
 MonitorPlugin
 ::write(const QByteArray &writeData)
 {
-
+    LOGV("writing data to port [%1]", QString(writeData.toHex()));
     this->writeData.append(writeData);
 
     const qint64 bytesWritten = serialPort.write(writeData);
@@ -175,8 +179,6 @@ MonitorPlugin
                              .arg(serialPort.portName())
                              .arg(serialPort.errorString()));
     }
-
-    LOGV("writing data to port [%1]", QString(writeData.toHex()));
 
     this->writeTimeoutTimer.start(5000);
 }
@@ -199,10 +201,10 @@ void
 MonitorPlugin
 ::handleWriteTimeout()
 {
+    LOG("write to device timeout");
     emit onErrorMessage(QObject::tr("Operation timed out for port %1, error: %2")
                          .arg(serialPort.portName())
                          .arg(serialPort.errorString()));
-    LOG("write to device timeout");
 }
 
 void
@@ -212,11 +214,13 @@ MonitorPlugin
     if(dataToSend.size() > 0)
     {
         LOGV("time to send some data from queue, writing [%1]", QString(dataToSend.first().toHex()));
-        write(dataToSend.first());
+        QByteArray data = dataToSend.first();
         dataToSend.removeFirst();
+        write(data);
+
     }
     else{
-        LOG("time to send some data from queue, but there isn't any");
+        //LOG("time to send some data from queue, but there isn't any");
     }
 }
 
@@ -248,6 +252,7 @@ void
 MonitorPlugin
 ::handleError(QSerialPort::SerialPortError serialPortError)
 {
+    LOGV("serial port error occured: %1", serialPortError);
     if (serialPortError == QSerialPort::WriteError)
     {
         emit onErrorMessage(QObject::tr("An I/O error occurred while writing the data to port %1, error: %2")
@@ -260,6 +265,4 @@ MonitorPlugin
                             .arg(serialPort.portName())
                             .arg(serialPort.errorString()));
     }
-
-    LOGV("serial port error occured: %1", serialPortError);
 }
