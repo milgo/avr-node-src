@@ -123,6 +123,17 @@ MonitorPlugin
     LOGV("adding request with id=%1 to queue", request.id);
 }
 
+void
+MonitorPlugin
+::sendRequestToDevice(quint8 command, quint8 param, quint32 data)
+{
+    DeviceDataFrame ddf;
+    ddf.command = command;
+    ddf.param = param;
+    ddf.data = data;
+    sendRequestToDevice(ddf);
+}
+
 bool
 MonitorPlugin
 ::disconnectFromDevice()

@@ -49,6 +49,9 @@ public:
     void
     sendRequestToDevice(DeviceDataFrame request);
 
+    void
+    sendRequestToDevice(quint8 command, quint8 param, quint32 data);
+
 signals:
 
     void
