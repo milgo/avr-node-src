@@ -64,6 +64,9 @@ signals:
     onConnectedToDevice();
 
     void
+    onDisconnectedFromDevice();
+
+    void
     dataReceived(QByteArray data);
 
     void
@@ -112,13 +115,13 @@ private:
     QTimer writeTimeoutTimer;
     QTimer writeTimer;
     QTimer startWriteTimer;
-    QTimer repeatRequestTimer;
+    //QTimer repeatRequestTimer;
 
     QList<QByteArray> dataToSend;
-    QMap<qint8, DeviceDataFrame> requestList;
+    //QMap<qint8, DeviceDataFrame> requestList;
     QByteArray writeData;
     qint64 bytesWritten = 0;
-    quint8 requestCounter = 0;
+    //quint8 requestCounter = 0;
 };
 
 #endif // MONITORPLUGIN_H

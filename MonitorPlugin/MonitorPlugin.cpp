@@ -25,13 +25,13 @@ MonitorPlugin()
 
     QObject::connect(&writeTimeoutTimer, &QTimer::timeout, this, &MonitorPlugin::handleWriteTimeout);
     QObject::connect(&writeTimer, &QTimer::timeout, this, &MonitorPlugin::handleWriteTimerTimeout);
-    QObject::connect(&repeatRequestTimer, &QTimer::timeout, this, &MonitorPlugin::handleRepeatRequestTimeout);
+    //QObject::connect(&repeatRequestTimer, &QTimer::timeout, this, &MonitorPlugin::handleRepeatRequestTimeout);
 
     QObject::connect(&startWriteTimer, &QTimer::timeout, [&](){
         writeTimer.start(10);
         LOG("starting writer timer");
-        repeatRequestTimer.start(2000);
-        LOG("starting repeat request timer");
+        //repeatRequestTimer.start(2000);
+        //LOG("starting repeat request timer");
         emit onConnectedToDevice();
     });
 }
@@ -77,7 +77,7 @@ replyHandler(QByteArray buffer, quint16 bytes_received)
 
     LOGV("received replay with id=%1", ddf.id);
     //remove request when there is an answer
-    for (auto it = requestList.begin(); it != requestList.end();)
+    /*for (auto it = requestList.begin(); it != requestList.end();)
     {
         if (it.key() == ddf.id)
         {
@@ -86,8 +86,7 @@ replyHandler(QByteArray buffer, quint16 bytes_received)
         }
         else
             ++it;
-    }
-
+    }*/
 
     emit onReplyFromDevice(ddf);
 }
@@ -117,10 +116,22 @@ void
 MonitorPlugin
 ::sendRequestToDevice(DeviceDataFrame request)
 {
-    request.id = requestCounter;
-    requestList[requestCounter] = request;
-    requestCounter++;
+    //request.id = requestCounter;
+    //requestList[requestCounter] = request;
+    //requestCounter++;
+    QByteArray byteArray;
+
+    QDataStream stream(&byteArray, QIODevice::WriteOnly);
+    stream.setVersion(QDataStream::Qt_4_5);
+
+    stream << request.id
+           << request.command
+           << request.param
+           << request.data;
+
+    //LOGV("repeating request with id=%1", request.id);
     LOGV("adding request with id=%1 to queue", request.id);
+    emit sendDataFrame(byteArray, byteArray.size());
 }
 
 void
@@ -139,18 +150,19 @@ MonitorPlugin
 ::disconnectFromDevice()
 {
     writeTimer.stop();
-    repeatRequestTimer.stop();
-    requestList.clear();
+    //repeatRequestTimer.stop();
+    //requestList.clear();
     dataToSend.clear();
     writeData.clear();
     bytesWritten = 0;
-    requestCounter = 0;
+    //requestCounter = 0;
 
     if (serialPort.isOpen())
     {
         serialPort.close();
         LOG("device disconnected");
-        emit onInfoMessage("Device disconnected...");        
+        emit onInfoMessage("Device disconnected...");
+        emit onDisconnectedFromDevice();
         return true;
     }    
     return false;
@@ -239,7 +251,7 @@ void
 MonitorPlugin
 ::handleRepeatRequestTimeout()
 {
-    LOG("any request to repeat?");
+    /*LOG("any request to repeat?");
     for (auto it = requestList.begin(); it != requestList.end();)
     {
         QByteArray byteArray;
@@ -256,7 +268,7 @@ MonitorPlugin
         LOGV("repeating request with id=%1", request.id);
         emit sendDataFrame(byteArray, byteArray.size());
         ++it;
-    }
+    }*/
 }
 
 void
