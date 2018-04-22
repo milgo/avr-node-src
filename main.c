@@ -27,27 +27,23 @@ void hdlc_on_rx_frame(const u8_t * data, size_t nr_of_bytes)
 
 	u16_t id = U16_TO_LITTLE_ENDIAN(request->id);
 	u8_t forced = 0;
-	//u32_t data =
+
+	reply.command = request->command;
+	reply.id = id;
+	reply.param = request->param;
+	reply.data = request->data;
 
 	switch(request->command){
 		case 0x17: // Get Checksum
-			reply.command = request->command;
-			reply.id = id;
-			reply.param = request->param;
 			reply.data = CHECKSUM;
-			hdlc_tx_frame((u8_t*)&reply, sizeof(DeviceDataFrame));
 			break;
 		case 0x16: //Get data value
 			if(request->param >= MAX_DATA)
 				break;
-			reply.command = request->command;
-			reply.id = id;
-			reply.param = request->param;
 			reply.data = _data[request->param];
-			hdlc_tx_frame((u8_t*)&reply, sizeof(DeviceDataFrame));
 			break;
 		case 0x18: //Set force enabled
-			force_enabled = request->param;
+			force_enabled = request->param;			
 			break;
 		case 0x19: //Force data id
 			set_data_forced(request->param, 1);
@@ -59,13 +55,11 @@ void hdlc_on_rx_frame(const u8_t * data, size_t nr_of_bytes)
 			break;
 		case 0x21: //Get force data id
 			forced = is_data_forced(request->param);
-			reply.command = request->command;
-			reply.id = id;
-			reply.param = request->param;
-			reply.data = forced;
-			hdlc_tx_frame((u8_t*)&reply, sizeof(DeviceDataFrame));
+			reply.data = forced;			
 			break;
 	}
+	
+	hdlc_tx_frame((u8_t*)&reply, sizeof(DeviceDataFrame));
 }
 
 int main(void)
