@@ -116,9 +116,9 @@ void
 MonitorPlugin
 ::sendRequestToDevice(DeviceDataFrame request)
 {
-    //request.id = requestCounter;
+    request.id = requestCounter;
     //requestList[requestCounter] = request;
-    //requestCounter++;
+    requestCounter++;
     QByteArray byteArray;
 
     QDataStream stream(&byteArray, QIODevice::WriteOnly);

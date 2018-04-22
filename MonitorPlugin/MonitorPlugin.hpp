@@ -121,7 +121,7 @@ private:
     //QMap<qint8, DeviceDataFrame> requestList;
     QByteArray writeData;
     qint64 bytesWritten = 0;
-    //quint8 requestCounter = 0;
+    quint8 requestCounter = 0;
 };
 
 #endif // MONITORPLUGIN_H
