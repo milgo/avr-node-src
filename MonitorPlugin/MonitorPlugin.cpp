@@ -25,14 +25,12 @@ MonitorPlugin()
 
     QObject::connect(&writeTimeoutTimer, &QTimer::timeout, this, &MonitorPlugin::handleWriteTimeout);
     QObject::connect(&writeTimer, &QTimer::timeout, this, &MonitorPlugin::handleWriteTimerTimeout);
-    //QObject::connect(&repeatRequestTimer, &QTimer::timeout, this, &MonitorPlugin::handleRepeatRequestTimeout);
 
     QObject::connect(&startWriteTimer, &QTimer::timeout, [&](){
         writeTimer.start(10);
         LOG("starting writer timer");
-        //repeatRequestTimer.start(2000);
-        //LOG("starting repeat request timer");
         emit onConnectedToDevice();
+        sendRequestForChecksum();
     });
 }
 
@@ -76,17 +74,42 @@ replyHandler(QByteArray buffer, quint16 bytes_received)
             >> ddf.data;
 
     LOGV("received replay with id=%1", ddf.id);
-    //remove request when there is an answer
-    /*for (auto it = requestList.begin(); it != requestList.end();)
+
+    switch(ddf.command){
+    case MonitorCommands::GetNodeForceStatus:
     {
-        if (it.key() == ddf.id)
+        emit onNodeDataForcedStatus(ddf.id, ddf.param==1, ddf.data);
+        break;
+    }
+    case MonitorCommands::GetProgramChecksum:
+    {
+        emit onChecksumRecieved(ddf.data);
+        break;
+    }
+    case MonitorCommands::SetForcingEnabled:
+    {
+        if(ddf.param == 1)
         {
-            LOGV("removing request id=%1 from repeat request queue", ddf.id);
-            it = requestList.erase(it);
+          qDebug("Setting force enabled on device");
+          //emit mainWidget.acquireNodeValues();
+          emit onForceEnabled();
         }
         else
-            ++it;
-    }*/
+        {
+          qDebug("Setting force disable on device");
+          disconnectFromDevice();
+        }
+        break;
+    }
+    case MonitorCommands::GetNodeValue:
+    {
+        qDebug(QString("[main.cpp] recieved value for node(%1) = [%2]").arg(QString::number(ddf.param, 16), QString::number(ddf.data, 16)).toUtf8());
+        quint16 id = ddf.param;
+        quint32 value = ddf.data;
+        emit onNodeDataRecieved(id, value);
+        break;
+    }
+    }
 
     emit onReplyFromDevice(ddf);
 }
@@ -149,13 +172,12 @@ bool
 MonitorPlugin
 ::disconnectFromDevice()
 {
+    //send unforce first !!!!!!!!!!
+
     writeTimer.stop();
-    //repeatRequestTimer.stop();
-    //requestList.clear();
     dataToSend.clear();
     writeData.clear();
     bytesWritten = 0;
-    //requestCounter = 0;
 
     if (serialPort.isOpen())
     {
@@ -249,30 +271,6 @@ MonitorPlugin
 
 void
 MonitorPlugin
-::handleRepeatRequestTimeout()
-{
-    /*LOG("any request to repeat?");
-    for (auto it = requestList.begin(); it != requestList.end();)
-    {
-        QByteArray byteArray;
-        DeviceDataFrame request = it.value();
-
-        QDataStream stream(&byteArray, QIODevice::WriteOnly);
-        stream.setVersion(QDataStream::Qt_4_5);
-
-        stream << request.id
-               << request.command
-               << request.param
-               << request.data;
-
-        LOGV("repeating request with id=%1", request.id);
-        emit sendDataFrame(byteArray, byteArray.size());
-        ++it;
-    }*/
-}
-
-void
-MonitorPlugin
 ::handleError(QSerialPort::SerialPortError serialPortError)
 {
     LOGV("serial port error occured: %1", serialPortError);
@@ -288,4 +286,49 @@ MonitorPlugin
                             .arg(serialPort.portName())
                             .arg(serialPort.errorString()));
     }
+}
+
+void
+MonitorPlugin::
+sendRequestForDisconnection(){
+    sendRequestForForceDisable();
+}
+
+void
+MonitorPlugin::
+sendRequestForChecksum(){
+    sendRequestToDevice(MonitorCommands::GetProgramChecksum, 0, 0);
+}
+
+void
+MonitorPlugin::
+sendRequestForForceEnable(){
+    sendRequestToDevice(MonitorCommands::SetForcingEnabled, 1, 0);
+}
+
+void
+MonitorPlugin::
+sendRequestForForceDisable(){
+    sendRequestToDevice(MonitorCommands::SetForcingEnabled, 0, 0);
+}
+
+void
+MonitorPlugin::
+forceNodeDataValue(quint8 id, bool force, quint32 data){
+    if(force)
+        sendRequestToDevice(MonitorCommands::SetNodeForceEnable, id, data);
+    else
+        sendRequestToDevice(MonitorCommands::SetNodeForceDisable, id, 0);
+}
+
+void
+MonitorPlugin::
+getNodeDataForcedStatus(quint8 id){
+    sendRequestToDevice(MonitorCommands::GetNodeForceStatus, id, 0);
+}
+
+void
+MonitorPlugin::
+sendRequestForNodeData(quint8 id){
+    sendRequestToDevice(MonitorCommands::GetNodeValue, id, 0);
 }

@@ -19,6 +19,11 @@ volatile uint32_t time = 0;
 volatile uint32_t dtime = 0;
 volatile uint8_t force_enabled = 0;
 
+void zero_data_forced()
+{
+	for(int i=0; i<MAX_DATA_FORCED; i++)_data_forced[i]=0;
+}
+
 void set_data_forced(uint8_t id, uint8_t forced)
 {
     if(forced > 0)
@@ -48,9 +53,6 @@ void end()
 void init()
 {
     for(int i=0; i<MAX_DATA; i++)_data[i]=0;
-	force_enabled = 1;
-	set_data_forced(4,1);
-	_data[4]=1;
 }
 
 void DO1(UINT id, BOOL out)

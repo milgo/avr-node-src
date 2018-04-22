@@ -43,7 +43,8 @@ void hdlc_on_rx_frame(const u8_t * data, size_t nr_of_bytes)
 			reply.data = _data[request->param];
 			break;
 		case 0x18: //Set force enabled
-			force_enabled = request->param;			
+			force_enabled = request->param;
+			zero_data_forced();
 			break;
 		case 0x19: //Force data id
 			set_data_forced(request->param, 1);

@@ -25,6 +25,16 @@ struct DeviceDataFrame
     quint32 data;
 };
 
+enum MonitorCommands : quint8
+{
+    GetNodeValue = 0x16,
+    GetProgramChecksum = 0x17,
+    SetForcingEnabled = 0x18,
+    SetNodeForceEnable = 0x19,
+    SetNodeForceDisable = 0x20,
+    GetNodeForceStatus = 0x21
+};
+
 class MONITORPLUGINSHARED_EXPORT MonitorPlugin : public QObject, IMonitorPlugin
 {
     Q_OBJECT
@@ -52,6 +62,21 @@ public:
     void
     sendRequestToDevice(quint8 command, quint8 param, quint32 data);
 
+    void
+    sendRequestForNodeData(quint8 id);
+
+    void
+    sendRequestForForceEnable();
+
+    void
+    sendRequestForForceDisable();
+
+    void
+    sendRequestForChecksum();
+
+    void
+    sendRequestForDisconnection();
+
 signals:
 
     void
@@ -75,6 +100,19 @@ signals:
     void
     onReplyFromDevice(DeviceDataFrame reply);
 
+    //----
+    void
+    onChecksumRecieved(quint32 checksum);
+
+    void
+    onNodeDataRecieved(quint8 id, quint32 data);
+
+    void
+    onForceEnabled();
+
+    void
+    onNodeDataForcedStatus(quint8 id, bool forced, quint32 data);
+
 private:
 
     void
@@ -82,6 +120,14 @@ private:
 
     void
     write(const QByteArray &writeData);
+
+public slots:
+
+    void
+    forceNodeDataValue(quint8 id, bool force, quint32 data);
+
+    void
+    getNodeDataForcedStatus(quint8 id);
 
 private slots:
 
@@ -93,9 +139,6 @@ private slots:
 
     void
     handleWriteTimerTimeout();
-
-    void
-    handleRepeatRequestTimeout();
 
     void
     handleError(QSerialPort::SerialPortError error);
@@ -115,10 +158,7 @@ private:
     QTimer writeTimeoutTimer;
     QTimer writeTimer;
     QTimer startWriteTimer;
-    //QTimer repeatRequestTimer;
-
     QList<QByteArray> dataToSend;
-    //QMap<qint8, DeviceDataFrame> requestList;
     QByteArray writeData;
     qint64 bytesWritten = 0;
     quint8 requestCounter = 0;
