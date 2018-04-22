@@ -26,6 +26,7 @@ void hdlc_on_rx_frame(const u8_t * data, size_t nr_of_bytes)
 	DeviceDataFrame reply;
 
 	u16_t id = U16_TO_LITTLE_ENDIAN(request->id);
+	u8_t forced = 0;
 	//u32_t data =
 
 	switch(request->command){
@@ -55,6 +56,14 @@ void hdlc_on_rx_frame(const u8_t * data, size_t nr_of_bytes)
 			break;
 		case 0x20: //Unforce data id
 			set_data_forced(request->param, 0);
+			break;
+		case 0x21: //Get force data id
+			forced = is_data_forced(request->param);
+			reply.command = request->command;
+			reply.id = id;
+			reply.param = request->param;
+			reply.data = forced;
+			hdlc_tx_frame((u8_t*)&reply, sizeof(DeviceDataFrame));
 			break;
 	}
 }

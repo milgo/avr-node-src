@@ -12,6 +12,7 @@ volatile uint32_t _data[MAX_DATA];
 volatile uint8_t force_enabled;
 
 void set_data_forced(uint8_t id, uint8_t forced);
+uint8_t is_data_forced(uint8_t id);
 
 /*VARDEF*/ #define UINT uint32_t
 /*VARDEF*/ #define INT uint32_t
