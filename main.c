@@ -5,11 +5,11 @@
 #include "crc32.h"
 #include "functions.h"
 
-#define GetNodeValue 0x16,
-#define GetProgramChecksum 0x17,
-#define SetForcingEnabled 0x18,
-#define SetNodeForceEnable 0x19,
-#define SetNodeForceDisable 0x20,
+#define GetNodeValue 0x16
+#define GetProgramChecksum 0x17
+#define SetForcingEnabled 0x18
+#define SetNodeForceEnable 0x19
+#define SetNodeForceDisable 0x20
 #define GetNodeForceStatus 0x21
 
 static void tx_u8(uint8_t data)
@@ -32,11 +32,10 @@ void hdlc_on_rx_frame(const u8_t * data, size_t nr_of_bytes)
 	DeviceDataFrame *request = (DeviceDataFrame*)data;
 	DeviceDataFrame reply;
 
-	u16_t id = U16_TO_LITTLE_ENDIAN(request->id);
 	u8_t forced = 0;
 
 	reply.command = request->command;
-	reply.id = id;
+	reply.id = request->id;
 	reply.param = request->param;
 	reply.data = request->data;
 

@@ -145,6 +145,7 @@ MonitorPlugin
     QByteArray byteArray;
 
     QDataStream stream(&byteArray, QIODevice::WriteOnly);
+    stream.setByteOrder(QDataStream::LittleEndian);
     stream.setVersion(QDataStream::Qt_4_5);
 
     stream << request.id

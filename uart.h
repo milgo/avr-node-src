@@ -17,8 +17,6 @@
 #define UART_RX_CIRCLE_BUFFER_SIZE 32
 #define UART_TX_CIRCLE_BUFFER_SIZE 32
 
-#define U16_TO_LITTLE_ENDIAN(v) ((v & 0xFF00)) >> 8 | ((v & 0xFF) << 8)
-
 typedef struct _devicedataframe_struct
 {
     u16_t id;
