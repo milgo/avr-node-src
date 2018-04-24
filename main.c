@@ -5,6 +5,13 @@
 #include "crc32.h"
 #include "functions.h"
 
+#define GetNodeValue 0x16,
+#define GetProgramChecksum 0x17,
+#define SetForcingEnabled 0x18,
+#define SetNodeForceEnable 0x19,
+#define SetNodeForceDisable 0x20,
+#define GetNodeForceStatus 0x21
+
 static void tx_u8(uint8_t data)
 {
 	//How do we send bytes
@@ -34,29 +41,30 @@ void hdlc_on_rx_frame(const u8_t * data, size_t nr_of_bytes)
 	reply.data = request->data;
 
 	switch(request->command){
-		case 0x17: // Get Checksum
+		case GetProgramChecksum:
 			reply.data = CHECKSUM;
 			break;
-		case 0x16: //Get data value
+		case GetNodeValue: //Get data value
 			if(request->param >= MAX_DATA)
 				break;
 			reply.data = _data[request->param];
 			break;
-		case 0x18: //Set force enabled
+		case SetForcingEnabled: //Set force enabled
 			force_enabled = request->param;
 			zero_data_forced();
 			break;
-		case 0x19: //Force data id
+		case SetNodeForceEnable:
 			set_data_forced(request->param, 1);
 			if(request->param < MAX_DATA && request->param >=0 )
 				_data[request->param] = request->data;
 			break;
-		case 0x20: //Unforce data id
+		case SetNodeForceDisable: //Unforce data id
 			set_data_forced(request->param, 0);
 			break;
-		case 0x21: //Get force data id
+		case GetNodeForceStatus: //Get force data id
 			forced = is_data_forced(request->param);
-			reply.data = forced;			
+			reply.param = forced;
+			reply.data = _data[request->param];
 			break;
 	}
 	
