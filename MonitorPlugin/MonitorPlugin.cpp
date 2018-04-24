@@ -139,6 +139,8 @@ void
 MonitorPlugin
 ::sendRequestToDevice(DeviceDataFrame request)
 {
+    if(!isConnected())return;
+
     request.id = requestCounter;
     //requestList[requestCounter] = request;
     requestCounter++;
