@@ -1,0 +1,3 @@
+#include "variables.h"
+
+%DECLARE_VARIABLES%

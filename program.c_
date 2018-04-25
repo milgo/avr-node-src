@@ -1,0 +1,9 @@
+#include "program.h"
+#include "variables.h"
+
+void loop()
+{
+	begin();
+        %MAIN_PROGRAM%
+	end();
+}

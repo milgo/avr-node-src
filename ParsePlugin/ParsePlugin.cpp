@@ -3,6 +3,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <QJsonArray>
+#include <QDirIterator>
 
 ParsePlugin::
 ParsePlugin()
@@ -130,123 +131,110 @@ ParsePlugin::
 compile(QJsonObject program, QString path)
 {
     bool errors = false;
-    QFile hfile( path + "/variables.h" );
-    if ( hfile.open(QIODevice::WriteOnly) )
+    QJsonArray variables = program["variables"].toArray();
+    QJsonArray types = program["types"].toArray();
+
+    /* VARIABLES DEFINITION STRING */
+    QString varDefineString;
+    QTextStream varDefineStream( &varDefineString );
+    foreach (const QJsonValue & value, variables)
     {
-        QTextStream stream( &hfile );
-        stream << "#ifndef _VARIABLES_H_\r\n";
-        stream << "#define _VARIABLES_H_\r\n\r\n";
-        stream << "#include \"functions.h\"\r\n";
-        stream << "#include \"max.h\"\r\n\r\n";
+        QJsonObject obj = value.toObject();
+        varDefineStream << "#define " << obj["name"].toString() << " " << obj["id"].toString() << endl;
+    }
 
-        QJsonArray variables = program["variables"].toArray();
+    varDefineStream << endl << endl;
 
-        foreach (const QJsonValue & value, variables)
+    foreach (const QJsonValue & value, types)
+    {
+        QString typeName = value.toString();
+        varDefineStream << typeName << " set" << typeName << "(uint32_t index, " << typeName << " value);" << endl;
+        varDefineStream << typeName << " get" << typeName << "(uint32_t index);" << endl << endl;
+    }
+
+    /* CHECKSUM DEFINITION STRING */
+    QString checksumDefineString;
+    QTextStream checksumDefineStream( &checksumDefineString );
+    checksumDefineStream << "#define CHECKSUM 0x" << program["crc32"].toString() << endl;
+
+    /* MAX DATA SIZE DEFINITION STRING */
+    QString maxDataDefineString;
+    QTextStream maxDataDefineStream( &maxDataDefineString );
+    maxDataDefineStream << "#define MAX_DATA" << " " << program["data_size"].toString() << endl;
+
+    /* VARIABLES DECLARATION STRING */
+    QString varDeclString;
+    QTextStream varDeclStream( &varDeclString );
+
+    //QJsonArray types = program["types"].toArray();
+    foreach (const QJsonValue & value, types)
+    {
+        QString typeName = value.toString();
+        varDeclStream << typeName << " set" << typeName << "(uint32_t index, " << typeName << " value){_data[index]=value; return value;}" << endl;
+        varDeclStream << typeName << " get" << typeName << "(uint32_t index){return _data[index];}" << endl;
+    }
+
+    /* MAIN PROGRAM STRING */
+    QString programString;
+    QTextStream programStream(&programString);
+
+    QJsonArray nodes = program["program"].toArray();
+    //QJsonArray variables = program["variables"].toArray();
+
+    foreach (const QJsonValue & value, nodes)
+    {
+        QJsonObject obj = value.toObject();
+
+        if(!obj["root"].toString().compare("1"))
         {
-            QJsonObject obj = value.toObject();
-            stream << "#define " << obj["name"].toString() << " " << obj["id"].toString() << "\r\n";
-        }
-
-        stream << "\r\n" << endl;
-
-        //declare variable arrays, setters and getters
-        QJsonArray types = program["types"].toArray();
-
-        foreach (const QJsonValue & value, types)
-        {
-            QString typeName = value.toString();
-            stream << typeName << " set" << typeName << "(uint32_t index, " << typeName << " value);\r\n";
-            stream << typeName << " get" << typeName << "(uint32_t index);" << "\r\n\r\n";
-        }
-
-        stream << "#endif" << endl;
-    }
-    else
-    {
-        emit this->onErrorMessage(QString("ParsePlugin: compilation error #1"));
-        errors = true;
-    }
-
-    //generate crc32 definition file
-    QFile crcfile( path + "/crc32.h" );
-    if ( crcfile.open(QIODevice::WriteOnly) )
-    {
-        QTextStream stream( &crcfile );
-        stream << "#ifndef _CRC32_H_" << "\r\n";
-        stream << "#define _CRC32_H_" << "\r\n\r\n";
-        stream << "#define CHECKSUM 0x" << program["crc32"].toString().toLatin1() << "\r\n";
-        stream << "\r\n#endif" << "\r\n";
-    }
-    else
-    {
-        emit this->onErrorMessage(QString("ParsePlugin: compilation error #2"));
-        errors = true;
-    }
-
-    //generate max definition file
-    QFile mfile( path + "/max.h" );
-    if ( mfile.open(QIODevice::WriteOnly) )
-    {
-        QTextStream stream( &mfile );
-        stream << "#ifndef _MAX_H_" << "\r\n";
-        stream << "#define _MAX_H_" << "\r\n\r\n";
-        stream << "#define MAX_DATA" << " " << program["data_size"].toString() << "\r\n";
-        stream << "\r\n#endif" << "\r\n";
-    }
-    else
-    {
-        emit this->onErrorMessage(QString("ParsePlugin: compilation error #3"));
-        errors = true;
-    }
-
-    QFile cfile( path + "/variables.c" );
-    if ( cfile.open(QIODevice::WriteOnly) )
-    {
-        QTextStream stream( &cfile );
-        stream << "#include \"variables.h\"\r\n\r\n";
-
-        QJsonArray types = program["types"].toArray();
-        foreach (const QJsonValue & value, types)
-        {
-            QString typeName = value.toString();
-            stream << typeName << " set" << typeName << "(uint32_t index, " << typeName << " value){_data[index]=value; return value;}\r\n";
-            stream << typeName << " get" << typeName << "(uint32_t index){return _data[index];}\r\n";
+            programStream << "\t" + compileNode(nodes, variables, obj).toLatin1() << endl;
         }
     }
-    else
+
+    /* FIND TEMPLATES AND INSERT STRINGS */
+    QDirIterator it(path, QStringList() << "*.*_", QDir::Files, QDirIterator::Subdirectories);
+    while (it.hasNext())
     {
-        emit this->onErrorMessage(QString("ParsePlugin: compilation error #4"));
-        errors = true;
-    }
+        QString sourceFilePath = it.next();
+        QString descFilePath = sourceFilePath.left(sourceFilePath.lastIndexOf(QChar('_')));
 
-    QFile pfile( path + "/program.c" );
-    if( pfile.open(QIODevice::WriteOnly))
-    {
-        QTextStream stream( &pfile );
-        stream << "#include \"program.h\"\r\n";
-        stream << "#include \"variables.h\"\r\n\r\n";
-        stream << "void loop()\r\n{\r\n\tbegin();\r\n";
+        QFile sourceFile(sourceFilePath);
+        QFile descFile(descFilePath);
 
-        QJsonArray nodes = program["program"].toArray();
-        QJsonArray variables = program["variables"].toArray();
-
-        foreach (const QJsonValue & value, nodes)
+        if ( sourceFile.open(QIODevice::ReadOnly) )
         {
-            QJsonObject obj = value.toObject();
-
-            if(!obj["root"].toString().compare("1"))
+            if ( descFile.open(QIODevice::ReadWrite | QIODevice::Truncate | QIODevice::Text) )
             {
-                stream << "\t" + compileNode(nodes, variables, obj).toLatin1() + ";\r\n";
+                QTextStream instream(&sourceFile);
+                QTextStream outstream(&descFile);
+                while (!instream.atEnd())
+                {
+                    QString line = instream.readLine();
+
+                    if(line.trimmed() == "%MAIN_PROGRAM%"){
+                        outstream << programString;
+                    }
+                    else if(line.trimmed() == "%DECLARE_VARIABLES%"){
+                        outstream << varDeclString;
+                    }
+                    else if(line.trimmed() == "%DEFINE_MAX_DATA_SIZE%"){
+                        outstream << maxDataDefineString;
+                    }
+                    else if(line.trimmed() == "%DEFINE_CHECKSUM%"){
+                        outstream << checksumDefineString;
+                    }
+                    else if(line.trimmed() == "%DEFINE_VARIABLES%"){
+                        outstream << varDefineString;
+                    }
+                    else{
+                        outstream << line << endl;
+                    }
+
+                }
+                descFile.close();
             }
+            sourceFile.close();
         }
-
-        stream << "\tend();\r\n}\r\n";
-    }
-    else
-    {
-        emit this->onErrorMessage(QString("ParsePlugin: compilation error #5"));
-        errors = true;
-
     }
 
     if(errors)
