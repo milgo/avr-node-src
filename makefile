@@ -80,7 +80,7 @@ OBJDIR = .
 
 
 # List C source files here. (C dependencies are automatically generated.)
-SRC = $(TARGET).c functions.c setup.c program.c uart.c variables.c crc.c hdlc.c
+SRC = $(TARGET).c functions.c setup.c program.c uart.c variables.c crc.c hdlc.c spi.c winbond.c
 
 
 # List C++ source files here. (C dependencies are automatically generated.)

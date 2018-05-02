@@ -5,6 +5,9 @@
 #include <util/delay.h>
 #include <avr/interrupt.h>
 #include "uart.h"
+#include "hdlc.h"
+#include "spi.h"
+#include "winbond.h"
 
 #define SET_BIT(P,B,V) if(V==0){P&=~_BV(B);}else{P|=_BV(B);} //SINK
 #define GET_BIT(P,B) ((P & _BV(B))>>B)
@@ -19,7 +22,6 @@
 
 #define ADC_CHANNELS 2
 
-	void init(void);
 	void setup(void);
 
 #endif

@@ -1,7 +1,5 @@
 #include "program.h"
 #include "setup.h"
-#include "hdlc.h"
-#include "uart.h"
 #include "crc32.h"
 #include "functions.h"
 
@@ -82,6 +80,8 @@ int main(void)
 		//hdlc_tx_frame(test_string, 5);
 		//tx_u8_array(test_string, 27);
 		//_delay_ms(100);
+		w25_write_byte(0x00, 0xAA);
+		w25_read_byte(0x00);
 
         loop();
 
