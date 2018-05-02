@@ -187,7 +187,7 @@ compile(QJsonObject program, QString path)
 
         if(!obj["root"].toString().compare("1"))
         {
-            programStream << "\t" + compileNode(nodes, variables, obj).toLatin1() << endl;
+            programStream << "\t" + compileNode(nodes, variables, obj).toLatin1() << ";" << endl;
         }
     }
 
