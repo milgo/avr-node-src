@@ -23,5 +23,6 @@
 #define ADC_CHANNELS 2
 
 	void setup(void);
+	void init(void);
 
 #endif

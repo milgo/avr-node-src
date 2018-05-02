@@ -30,6 +30,7 @@ void setup()
 
 	spi_init_master();
 	w25_init();
+	init();
 
     usart_init(51);//19200
     _delay_ms(3000);

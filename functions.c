@@ -1,4 +1,5 @@
 #include "functions.h"
+#include "setup.h"
 #include "program.h"
 
 #define FORCED_SELECTOR(condition, id, normal, forced) do{\

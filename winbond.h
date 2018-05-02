@@ -27,7 +27,7 @@
 #define ADDR_BSHIFT1    8
 #define ADDR_BSHIFT0    0
 
-    void w25_init_(void);
+    void w25_init(void);
     int w25_read_byte(int addr);                                 // takes a 24-bit (3 bytes) address and returns the data (1 byte) at that location
     //int w25_readByte(int a2, int a1, int a0);                   // takes the address in 3 separate bytes A[23,16], A[15,8], A[7,0]
     void w25_read_stream(int addr, char* buf, int count);        // takes a 24-bit address, reads count bytes, and stores results in buf
