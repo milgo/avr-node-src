@@ -20,14 +20,22 @@ public:
     UploadPlugin();
     QObject* getObject() override;
 
-    bool upload() override;
+    bool uploadProject() override;
+    bool downloadProject(QJsonObject project) override;
 
 signals:
 
     void onErrorMessage(QString message) override;
     void onInfoMessage(QString message) override;
-    void onUploadSuccess(QJsonObject uploadedProject) override;
-    void onUploadFail() override;
+    void onDownloadProjectSuccess() override;
+    void onDownloadProjectFail() override;
+    void onUploadProjectSuccess(QJsonObject uploadedProject) override;
+    void onUploadProjectFail() override;
+    void sendRequestToDevice(quint8 command, quint8 param, quint32 data);
+
+public slots:
+
+    void onReplyFromDevice(quint16 id, quint8 command, quint8 param, quint32 data);
 
 };
 

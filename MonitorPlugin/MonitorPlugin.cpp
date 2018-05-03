@@ -112,6 +112,7 @@ replyHandler(QByteArray buffer, quint16 bytes_received)
     }
 
     emit onReplyFromDevice(ddf);
+    emit onReplyFromDevice(ddf.command, ddf.command, ddf.param, ddf.data);
 }
 
 bool

@@ -57,12 +57,6 @@ public:
     isConnected() override;
 
     void
-    sendRequestToDevice(DeviceDataFrame request);
-
-    void
-    sendRequestToDevice(quint8 command, quint8 param, quint32 data);
-
-    void
     sendRequestForNodeData(quint8 id);
 
     void
@@ -100,6 +94,9 @@ signals:
     void
     onReplyFromDevice(DeviceDataFrame reply);
 
+    void
+    onReplyFromDevice(quint16 id, quint8 command, quint8 param, quint32 data);
+
     //----
     void
     onChecksumRecieved(quint32 checksum);
@@ -128,6 +125,12 @@ public slots:
 
     void
     getNodeDataForcedStatus(quint8 id);
+
+    void
+    sendRequestToDevice(DeviceDataFrame request);
+
+    void
+    sendRequestToDevice(quint8 command, quint8 param, quint32 data);
 
 private slots:
 
