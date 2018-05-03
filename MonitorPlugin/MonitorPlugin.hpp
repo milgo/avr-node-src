@@ -32,7 +32,9 @@ enum MonitorCommands : quint8
     SetForcingEnabled = 0x18,
     SetNodeForceEnable = 0x19,
     SetNodeForceDisable = 0x20,
-    GetNodeForceStatus = 0x21
+    GetNodeForceStatus = 0x21,
+    WriteDataToExternalFlash = 0x22,
+    ReadDataFromExternalFlash = 0x23
 };
 
 class MONITORPLUGINSHARED_EXPORT MonitorPlugin : public QObject, IMonitorPlugin
@@ -110,6 +112,12 @@ signals:
     void
     onNodeDataForcedStatus(quint8 id, bool forced, quint32 data);
 
+    void
+    onDataWrittenToExternalFlash(quint32 addr, quint8 data);
+
+    void
+    onDataReadFromExternalFlash(quint32 addr, quint8 data);
+
 private:
 
     void
@@ -131,6 +139,12 @@ public slots:
 
     void
     sendRequestToDevice(quint8 command, quint8 param, quint32 data);
+
+    void
+    writeDataToExternalFlash(quint32 addr, quint8 data);
+
+    void
+    readDataFromExternalFlash(quint32 addr);
 
 private slots:
 

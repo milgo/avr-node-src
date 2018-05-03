@@ -30,7 +30,7 @@ MonitorPlugin()
         writeTimer.start(10);
         LOG("starting writer timer");
         emit onConnectedToDevice();
-        sendRequestForChecksum();
+        //sendRequestForChecksum();
     });
 }
 
@@ -107,6 +107,20 @@ replyHandler(QByteArray buffer, quint16 bytes_received)
         quint16 id = ddf.param;
         quint32 value = ddf.data;
         emit onNodeDataRecieved(id, value);
+        break;
+    }
+    case MonitorCommands::WriteDataToExternalFlash:
+    {
+        quint8 byte = (ddf.data & 0xFF);
+        quint32 addr = (ddf.data >> 8);
+        emit onDataWrittenToExternalFlash(addr, byte);
+        break;
+    }
+    case MonitorCommands::ReadDataFromExternalFlash:
+    {
+        quint8 byte = (ddf.data & 0xFF);
+        quint32 addr = (ddf.data >> 8);
+        emit onDataReadFromExternalFlash(addr, byte);
         break;
     }
     }
@@ -335,4 +349,17 @@ void
 MonitorPlugin::
 sendRequestForNodeData(quint8 id){
     sendRequestToDevice(MonitorCommands::GetNodeValue, id, 0);
+}
+
+void
+MonitorPlugin::
+writeDataToExternalFlash(quint32 addr, quint8 byte){
+    quint32 data = (addr << 8) | byte;
+    sendRequestToDevice(MonitorCommands::WriteDataToExternalFlash, 0, data);
+}
+
+void
+MonitorPlugin::
+readDataFromExternalFlash(quint32 addr){
+    sendRequestToDevice(MonitorCommands::ReadDataFromExternalFlash, 0, addr);
 }

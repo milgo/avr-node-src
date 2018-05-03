@@ -9,6 +9,9 @@
 #define SetNodeForceEnable 0x19
 #define SetNodeForceDisable 0x20
 #define GetNodeForceStatus 0x21
+#define GetNodeForceStatus 0x21
+#define WriteDataToExternalFlash 0x22
+#define ReadDataFromExternalFlash 0x23
 
 static void tx_u8(uint8_t data)
 {
@@ -31,6 +34,8 @@ void hdlc_on_rx_frame(const u8_t * data, size_t nr_of_bytes)
 	DeviceDataFrame reply;
 
 	u8_t forced = 0;
+	u32_t addr = 0;
+	int byte = 0;
 
 	reply.command = request->command;
 	reply.id = request->id;
@@ -63,6 +68,16 @@ void hdlc_on_rx_frame(const u8_t * data, size_t nr_of_bytes)
 			reply.param = forced;
 			reply.data = _data[request->param];
 			break;
+		case WriteDataToExternalFlash:
+			addr = (request->data >> 8);
+			byte = (request->data & 0xFF);
+			w25_write_byte(addr, byte);
+			break;
+		case ReadDataFromExternalFlash:
+			addr = request->data;
+			byte = w25_read_byte(addr);
+			reply.data = (addr << 8) | byte;
+			break;
 	}
 	
 	hdlc_tx_frame((u8_t*)&reply, sizeof(DeviceDataFrame));
@@ -79,7 +94,6 @@ int main(void)
     {
 		//hdlc_tx_frame(test_string, 5);
 		//tx_u8_array(test_string, 27);
-		//_delay_ms(100);
 		//w25_write_byte(0x00, 0xAA);
 		//w25_read_byte(0x00);
 

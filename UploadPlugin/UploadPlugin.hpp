@@ -31,11 +31,14 @@ signals:
     void onDownloadProjectFail() override;
     void onUploadProjectSuccess(QJsonObject uploadedProject) override;
     void onUploadProjectFail() override;
-    void sendRequestToDevice(quint8 command, quint8 param, quint32 data);
+
+    void writeDataToExternalFlash(quint32 addr, quint8 data);
+    void readDataFromExternalFlash(quint32 addr);
 
 public slots:
 
-    void onReplyFromDevice(quint16 id, quint8 command, quint8 param, quint32 data);
+    void onDataWrittenToExternalFlash(quint32 addr, quint8 byte);
+    void onDataReadFromExternalFlash(quint32 addr, quint8 byte);
 
 };
 
