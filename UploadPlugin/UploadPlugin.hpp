@@ -5,6 +5,7 @@
 #include <QObject>
 #include <QProcess>
 #include <QTimer>
+#include <memory>
 
 #include "UploadPlugin_global.hpp"
 #include "IUploadPlugin.hpp"
@@ -53,6 +54,8 @@ private:
     quint32 downloadIndex = 0;
     quint32 uploadSize = 0;
     quint32 uploadIndex = 0;
+
+    std::shared_ptr<QMetaObject::Connection> uploadCompleteLambda;
 };
 
 #endif // UPLOADPLUGIN_H
