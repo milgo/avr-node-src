@@ -4,9 +4,12 @@
 #include <QtPlugin>
 #include <QObject>
 #include <QProcess>
+#include <QTimer>
 
 #include "UploadPlugin_global.hpp"
 #include "IUploadPlugin.hpp"
+
+#define EXTERNAL_FLASH_MAX_ADRESS 0x7FFFFF
 
 class UPLOADPLUGINSHARED_EXPORT UploadPlugin : public QObject, IUploadPlugin
 {
@@ -22,6 +25,7 @@ public:
 
     bool uploadProject() override;
     bool downloadProject(QJsonObject project) override;
+    void uploadData(quint32 address, quint32 length);
 
 signals:
 
@@ -35,11 +39,20 @@ signals:
     void writeDataToExternalFlash(quint32 addr, quint8 data);
     void readDataFromExternalFlash(quint32 addr);
 
+    void onUploadDataComplete(QByteArray data);
+
 public slots:
 
     void onDataWrittenToExternalFlash(quint32 addr, quint8 byte);
     void onDataReadFromExternalFlash(quint32 addr, quint8 byte);
 
+private:
+
+    QByteArray dataToDownload;
+    QByteArray uploadDataBuf;
+    quint32 downloadIndex = 0;
+    quint32 uploadSize = 0;
+    quint32 uploadIndex = 0;
 };
 
 #endif // UPLOADPLUGIN_H

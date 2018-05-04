@@ -28,12 +28,12 @@
 #define ADDR_BSHIFT0    0
 
     void w25_init(void);
-    int w25_read_byte(int addr);                                 // takes a 24-bit (3 bytes) address and returns the data (1 byte) at that location
+    uint8_t w25_read_byte(uint32_t addr);                                 // takes a 24-bit (3 bytes) address and returns the data (1 byte) at that location
     //int w25_readByte(int a2, int a1, int a0);                   // takes the address in 3 separate bytes A[23,16], A[15,8], A[7,0]
-    void w25_read_stream(int addr, char* buf, int count);        // takes a 24-bit address, reads count bytes, and stores results in buf
-    void w25_write_byte(int addr, int data);                     // takes a 24-bit (3 bytes) address and a byte of data to write at that location
+    void w25_read_stream(uint32_t addr, char* buf, int count);        // takes a 24-bit address, reads count bytes, and stores results in buf
+    void w25_write_byte(uint32_t addr, uint8_t data);                     // takes a 24-bit (3 bytes) address and a byte of data to write at that location
     //void w25_writeByte(int a2, int a1, int a0, int data);       // takes the address in 3 separate bytes A[23,16], A[15,8], A[7,0]
-    void w25_write_stream(int addr, char* buf, int count);       // write count bytes of data from buf to memory, starting at addr
+    void w25_write_stream(uint32_t addr, char* buf, int count);       // write count bytes of data from buf to memory, starting at addr
     void w25_chip_erase(void);                                       // erase all data on chip
     void w25_write_enable(void);                                     // write enable
     void w25_write_disable(void);                                    // write disable

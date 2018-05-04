@@ -11,13 +11,13 @@ void w25_init(void) {
 
 
 // READING
-int w25_read_byte(int addr) {
+uint8_t w25_read_byte(uint32_t addr) {
     w25_chip_enable();
     spi_tranceiver(R_INST);
     spi_tranceiver((addr & ADDR_BMASK2) >> ADDR_BSHIFT2);
     spi_tranceiver((addr & ADDR_BMASK1) >> ADDR_BSHIFT1);
     spi_tranceiver((addr & ADDR_BMASK0) >> ADDR_BSHIFT0);
-    int response = spi_tranceiver(DUMMY_ADDR);
+    uint8_t response = spi_tranceiver(DUMMY_ADDR);
     w25_chip_disable();
     return response;
 }
@@ -31,7 +31,7 @@ int w25_read_byte(int addr) {
     w25_chipDisable();
     return response;
 }*/
-void w25_read_stream(int addr, char* buf, int count) {
+void w25_read_stream(uint32_t addr, char* buf, int count) {
     if (count < 1)
         return;
     w25_chip_enable();
@@ -45,7 +45,7 @@ void w25_read_stream(int addr, char* buf, int count) {
 }
 
 // WRITING
-void w25_write_byte(int addr, int data) {
+void w25_write_byte(uint32_t addr, uint8_t data) {
     w25_write_enable();
     w25_chip_enable();
     spi_tranceiver(W_INST);
@@ -69,7 +69,7 @@ void w25_write_byte(int addr, int data) {
     w25_writeDisable();
     _delay_ms(WAIT_TIME);
 }*/
-void w25_write_stream(int addr, char* buf, int count) {
+void w25_write_stream(uint32_t addr, char* buf, int count) {
     if (count < 1)
         return;
     w25_write_enable();

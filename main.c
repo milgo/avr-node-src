@@ -35,7 +35,7 @@ void hdlc_on_rx_frame(const u8_t * data, size_t nr_of_bytes)
 
 	u8_t forced = 0;
 	u32_t addr = 0;
-	int byte = 0;
+	uint8_t byte = 0;
 
 	reply.command = request->command;
 	reply.id = request->id;
@@ -71,6 +71,7 @@ void hdlc_on_rx_frame(const u8_t * data, size_t nr_of_bytes)
 		case WriteDataToExternalFlash:
 			addr = (request->data >> 8);
 			byte = (request->data & 0xFF);
+			reply.data = (addr << 8) | byte;
 			w25_write_byte(addr, byte);
 			break;
 		case ReadDataFromExternalFlash:

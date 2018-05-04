@@ -6,7 +6,7 @@ void spi_init_master (void)
     SPCR = (1<<SPE)|(1<<MSTR)|(1<<SPR0);
 }
 
-unsigned char spi_tranceiver (unsigned char data)
+uint8_t spi_tranceiver (uint8_t data)
 {
     SPDR = data;
     while(!(SPSR & (1<<SPIF) ));
