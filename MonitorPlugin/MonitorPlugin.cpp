@@ -123,6 +123,11 @@ replyHandler(QByteArray buffer, quint16 bytes_received)
         emit onDataReadFromExternalFlash(addr, byte);
         break;
     }
+    case MonitorCommands::EraseBlockFromExternalFlash:
+    {
+        emit onEraseDataFromExternalFlash(ddf.data);
+        break;
+    }
     }
 
     emit onReplyFromDevice(ddf);
@@ -362,4 +367,10 @@ void
 MonitorPlugin::
 readDataFromExternalFlash(quint32 addr){
     sendRequestToDevice(MonitorCommands::ReadDataFromExternalFlash, 0, addr);
+}
+
+void
+MonitorPlugin::
+eraseDataFromExternalFlash(quint32 addr){
+    sendRequestToDevice(MonitorCommands::EraseBlockFromExternalFlash, 0, addr);
 }

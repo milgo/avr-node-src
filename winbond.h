@@ -15,6 +15,7 @@
 #define R_INST          0x03
 #define W_INST          0x02
 #define C_ERASE_INST    0x60
+#define B_ERASE_INST	0xD8
 
 #define DUMMY_ADDR      0x00
 #define WAIT_TIME       1
@@ -39,5 +40,6 @@
     void w25_write_disable(void);                                    // write disable
     void w25_chip_enable(void);                                      // chip enable
     void w25_chip_disable(void);                                     // chip disable
+	void w25_block_erase(uint32_t addr);
 
 #endif

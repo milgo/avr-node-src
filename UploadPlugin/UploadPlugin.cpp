@@ -38,7 +38,7 @@ UploadPlugin::
 downloadProject(QJsonObject project)
 {
     emit onInfoMessage("downloading...");
-    emit writeDataToExternalFlash(0xFF, 0xAA);
+    emit writeDataToExternalFlash(0x7F0000, 0xaa);
     /*QJsonDocument doc(project);
     QByteArray compressedData = qCompress(doc.toJson(), 9);
 
@@ -76,7 +76,7 @@ onDataWrittenToExternalFlash(quint32 addr, quint8 byte)
     QTimer* timer = new QTimer();
     timer->setSingleShot(true);
         QObject::connect(timer, &QTimer::timeout, [this](){
-            emit readDataFromExternalFlash(0xFF);
+            emit readDataFromExternalFlash(0x7F0000);
             emit onDownloadProjectSuccess();//just to disconnect remove later
         });
     timer->start(1000);

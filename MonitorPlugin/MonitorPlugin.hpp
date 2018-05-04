@@ -34,7 +34,8 @@ enum MonitorCommands : quint8
     SetNodeForceDisable = 0x20,
     GetNodeForceStatus = 0x21,
     WriteDataToExternalFlash = 0x22,
-    ReadDataFromExternalFlash = 0x23
+    ReadDataFromExternalFlash = 0x23,
+    EraseBlockFromExternalFlash = 0x24
 };
 
 class MONITORPLUGINSHARED_EXPORT MonitorPlugin : public QObject, IMonitorPlugin
@@ -118,6 +119,9 @@ signals:
     void
     onDataReadFromExternalFlash(quint32 addr, quint8 data);
 
+    void
+    onEraseDataFromExternalFlash(quint32 addr);
+
 private:
 
     void
@@ -145,6 +149,9 @@ public slots:
 
     void
     readDataFromExternalFlash(quint32 addr);
+
+    void
+    eraseDataFromExternalFlash(quint32 addr);
 
 private slots:
 

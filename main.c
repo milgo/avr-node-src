@@ -12,6 +12,7 @@
 #define GetNodeForceStatus 0x21
 #define WriteDataToExternalFlash 0x22
 #define ReadDataFromExternalFlash 0x23
+#define EraseBlockFromExternalFlash 0x24
 
 static void tx_u8(uint8_t data)
 {
@@ -78,6 +79,9 @@ void hdlc_on_rx_frame(const u8_t * data, size_t nr_of_bytes)
 			addr = request->data;
 			byte = w25_read_byte(addr);
 			reply.data = (addr << 8) | byte;
+			break;
+		case EraseBlockFromExternalFlash:
+			w25_block_erase(request->data);
 			break;
 	}
 	

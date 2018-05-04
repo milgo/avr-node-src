@@ -95,6 +95,19 @@ void w25_chip_erase() {
     _delay_ms(WAIT_TIME);
 }
 
+void w25_block_erase(uint32_t addr)
+{
+	w25_write_enable();
+    w25_chip_enable();
+    spi_tranceiver(B_ERASE_INST);
+    spi_tranceiver((addr & ADDR_BMASK2) >> ADDR_BSHIFT2);
+    spi_tranceiver((addr & ADDR_BMASK1) >> ADDR_BSHIFT1);
+    spi_tranceiver((addr & ADDR_BMASK0) >> ADDR_BSHIFT0);
+    w25_chip_disable();
+    //w25_write_disable();
+    _delay_ms(WAIT_TIME);
+}
+
 //ENABLE/DISABLE (private functions)
 void w25_write_enable() {
     w25_chip_enable();
