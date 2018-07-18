@@ -145,6 +145,7 @@ MonitorPlugin
     if (!serialPort.open(QIODevice::ReadWrite))
     {
         LOG("connection error");
+        onErrorMessage("Connection failed.");
         return false;
     }
 

@@ -77,7 +77,7 @@ processFinished(int exitCode, QProcess::ExitStatus exitStatus)
         else
         {
             emit onInfoMessage(tr( "Process finished without errors." ) );
-            emit onDownloadSuccess();
+            emit onDownloadFinished();
         }
         break;
 

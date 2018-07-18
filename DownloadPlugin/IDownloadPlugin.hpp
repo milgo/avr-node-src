@@ -14,7 +14,7 @@ public:
     virtual bool download(QJsonObject downloadInfo) = 0;
     virtual void onInfoMessage(QString message) = 0;
     virtual void onErrorMessage(QString message) = 0;
-    virtual void onDownloadSuccess() = 0;
+    virtual void onDownloadFinished() = 0;
     virtual void onDownloadFail() = 0;
 };
 

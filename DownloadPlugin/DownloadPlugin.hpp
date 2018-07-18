@@ -33,7 +33,7 @@ signals:
 
     void onErrorMessage(QString message) override;
     void onInfoMessage(QString message) override;
-    void onDownloadSuccess() override;
+    void onDownloadFinished() override;
     void onDownloadFail() override;
 
 private:
