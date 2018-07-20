@@ -3,6 +3,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <QJsonArray>
+#include <QCoreApplication>
 
 BuildPlugin::
 BuildPlugin()
@@ -25,9 +26,13 @@ bool
 BuildPlugin::
 build(QJsonObject buildInfo)
 {
-    QString workingDir = buildInfo["build_directory"].toString();
+    QString workingDir = QCoreApplication::applicationDirPath() + buildInfo["build_dir"].toString();
+    QString buildCommand = buildInfo["build_command"].toString() + " BOARD_DIR=" + buildInfo["board_dir"].toString() +
+            " MCU=" + buildInfo["mcu"].toString() + " F_CPU=" + buildInfo["fcpu"].toString();
     process.setWorkingDirectory(workingDir);
-    process.start(buildInfo["build_command"].toString());
+    onInfoMessage(workingDir);
+    onInfoMessage(buildCommand);
+    process.start(buildCommand);
     errors = false;
     return true;
 }

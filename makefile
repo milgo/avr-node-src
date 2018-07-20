@@ -78,9 +78,10 @@ TARGET = main
 #     this an empty or blank macro!
 OBJDIR = .
 
+BOARD_DIR =
 
 # List C source files here. (C dependencies are automatically generated.)
-SRC = $(TARGET).c functions.c setup.c program.c uart.c variables.c crc.c hdlc.c spi.c winbond.c
+SRC = $(TARGET).c $(BOARD_DIR)/functions.c program.c uart.c variables.c crc.c hdlc.c spi.c winbond.c
 
 
 # List C++ source files here. (C dependencies are automatically generated.)
