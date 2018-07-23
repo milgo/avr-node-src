@@ -4,6 +4,7 @@
 #include <QTextStream>
 #include <QJsonArray>
 #include <QCoreApplication>
+#include <QDir>
 
 BuildPlugin::
 BuildPlugin()
@@ -24,11 +25,11 @@ getObject ()
 
 bool
 BuildPlugin::
-build(QJsonObject buildInfo)
+build(QJsonObject config, QJsonObject deviceConfig)
 {
-    QString workingDir = QCoreApplication::applicationDirPath() + buildInfo["build_dir"].toString();
-    QString buildCommand = buildInfo["build_command"].toString() + " BOARD_DIR=" + buildInfo["board_dir"].toString() +
-            " MCU=" + buildInfo["mcu"].toString() + " F_CPU=" + buildInfo["fcpu"].toString();
+    QString workingDir = QCoreApplication::applicationDirPath() + "/" +  config["build_dir"].toString();
+    QString buildCommand = config["build_command"].toString() + " BOARD_DIR=" + config["board_dir"].toString() +
+            " MCU=" + deviceConfig["mcu"].toString() + " F_CPU=" + deviceConfig["fcpu"].toString();
     process.setWorkingDirectory(workingDir);
     onInfoMessage(workingDir);
     onInfoMessage(buildCommand);

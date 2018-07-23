@@ -1,0 +1,9 @@
+{
+    "com_baud": "115200",
+    "com_device": "m8",
+    "com_port": "COM3",
+    "com_protocol": "arduino",
+    "fcpu": "16000000",
+    "mcu": "atmega8",
+    "parse_files": "functions.h"
+}

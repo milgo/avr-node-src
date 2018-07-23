@@ -11,7 +11,7 @@ public:
 
     virtual ~IDownloadPlugin() {}
     virtual QObject* getObject() = 0;
-    virtual bool download(QJsonObject downloadInfo) = 0;
+    virtual bool download(QJsonObject config, QJsonObject deviceConfig) = 0;
     virtual void onInfoMessage(QString message) = 0;
     virtual void onErrorMessage(QString message) = 0;
     virtual void onDownloadFinished() = 0;

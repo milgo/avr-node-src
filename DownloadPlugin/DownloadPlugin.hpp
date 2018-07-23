@@ -20,7 +20,7 @@ public:
     DownloadPlugin();
     QObject* getObject() override;
 
-    bool download(QJsonObject downloadInfo) override;
+    bool download(QJsonObject config, QJsonObject deviceConfig) override;
 
 public slots:
 

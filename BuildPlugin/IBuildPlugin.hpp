@@ -11,7 +11,7 @@ public:
 
     virtual ~IBuildPlugin() {}
     virtual QObject* getObject() = 0;
-    virtual bool build(QJsonObject buildInfo) = 0;
+    virtual bool build(QJsonObject config, QJsonObject deviceConfig) = 0;
     virtual void onInfoMessage(QString message) = 0;
     virtual void onErrorMessage(QString message) = 0;
     virtual void onBuildSuccess() = 0;

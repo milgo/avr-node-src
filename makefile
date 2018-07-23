@@ -81,7 +81,7 @@ OBJDIR = .
 BOARD_DIR =
 
 # List C source files here. (C dependencies are automatically generated.)
-SRC = $(TARGET).c $(BOARD_DIR)/functions.c program.c uart.c variables.c crc.c hdlc.c spi.c winbond.c
+SRC = $(TARGET).c $(BOARD_DIR)/functions.c program.c $(BOARD_DIR)/uart.c variables.c crc.c hdlc.c spi.c winbond.c
 
 
 # List C++ source files here. (C dependencies are automatically generated.)
@@ -115,7 +115,7 @@ DEBUG = dwarf-2
 #     Each directory must be seperated by a space.
 #     Use forward slashes for directory separators.
 #     For a directory that has spaces, enclose it in quotes.
-EXTRAINCDIRS = 
+EXTRAINCDIRS = $(BOARD_DIR)
 
 
 # Compiler flag to set the C Standard level.
@@ -277,11 +277,12 @@ LDFLAGS += $(PRINTF_LIB) $(SCANF_LIB) $(MATH_LIB)
 AVRDUDE_PROGRAMMER = stk500v2
 
 # com1 = serial port. Use lpt1 to connect to parallel port.
-AVRDUDE_PORT = com4    # programmer connected to serial device
+AVRDUDE_PORT = COM3    # programmer connected to serial device
 
 AVRDUDE_WRITE_FLASH = -U flash:w:$(TARGET).hex
 #AVRDUDE_WRITE_EEPROM = -U eeprom:w:$(TARGET).eep
 
+AVRDUDE_BAUD = 
 
 # Uncomment the following if you want avrdude's erase cycle counter.
 # Note that this counter needs to be initialized first using -Yn,
@@ -297,7 +298,7 @@ AVRDUDE_WRITE_FLASH = -U flash:w:$(TARGET).hex
 # to submit bug reports.
 #AVRDUDE_VERBOSE = -v -v
 
-AVRDUDE_FLAGS = -p $(MCU) -P $(AVRDUDE_PORT) -c $(AVRDUDE_PROGRAMMER)
+AVRDUDE_FLAGS = -p $(MCU) -P $(AVRDUDE_PORT) -c $(AVRDUDE_PROGRAMMER) -b $(AVRDUDE_BAUD)
 AVRDUDE_FLAGS += $(AVRDUDE_NO_VERIFY)
 AVRDUDE_FLAGS += $(AVRDUDE_VERBOSE)
 AVRDUDE_FLAGS += $(AVRDUDE_ERASE_COUNTER)
