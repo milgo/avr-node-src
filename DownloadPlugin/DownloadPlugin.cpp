@@ -32,8 +32,8 @@ download(QJsonObject config, QJsonObject deviceConfig)
     //QString comPort = downloadInfo["com_port"].toString();
     process.setWorkingDirectory(workingDir);
     //process.start(downloadInfo["download_command"].toString());
-    process.start("make program AVRDUDE_PORT=" + deviceConfig["com_port"].toString() + " AVRDUDE_PROGRAMMER=" +
-            deviceConfig["com_protocol"].toString() + " AVRDUDE_BAUD=" + deviceConfig["com_baud"].toString()); // add comport
+    process.start("make program AVRDUDE_PORT=" + deviceConfig["port"].toString() + " AVRDUDE_PROGRAMMER=" +
+            deviceConfig["programmer"].toString() + " AVRDUDE_BAUD=" + deviceConfig["baudrate"].toString() + " MCU=" + deviceConfig["mcu"].toString()); // add comport
     //process.start("avrdude -c arduino -p m8 -P "+comPort.toLatin1()+" -b 115200 -U flash:w:\""+fileName.toLatin1()+"\":a");
     errors = false;
     return true;

@@ -1,8 +1,7 @@
 {
-    "com_baud": "57600",
-    "com_device": "m328p",
-    "com_port": "COM3",
-    "com_protocol": "arduino",
+    "baudrate": "57600",
+    "port": "COM3",
+    "programmer": "arduino",
     "fcpu": "16000000",
     "mcu": "atmega328p",
     "parse_files": "functions.h"
