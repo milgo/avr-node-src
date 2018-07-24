@@ -48,7 +48,7 @@ void setup()
     //Setting DDRC bit to one makes PORTC pin output sink
 
     /* Setup AO outputs */
-    DDRB |= _BV(1) | _BV(2);
+    DDRB |= _BV(2);
 
     /* Setup PWM - TIMER1 */
     TCCR1A |= (1<<WGM10); // Fast PWM 8bit
@@ -62,6 +62,10 @@ void setup()
     DDRD &= ~_BV(2) & ~_BV(3) & ~_BV(4) & ~_BV(5);
 	/* Pull-up resistors */
     PORTD |= _BV(2) | _BV(3) | _BV(4) |_BV(5);
+	
+	/* Setup DO outputs */
+	DDRD |= _BV(6) | _BV(7); //Source current
+	DDRB |= _BV(0) | _BV(1);
 	
 	/* Setup ADC */
     DDRC &= ~_BV(0) & ~_BV(1);
@@ -129,8 +133,8 @@ void DO1(UINT id, BOOL out)
 	(
 		force_enabled,
 		id,
-		SET_BIT(DDRD, 6, out);_data[id] = out,
-		SET_BIT(DDRD, 6, _data[id])
+		SET_BIT(PORTD, 6, out);_data[id] = out,
+		SET_BIT(PORTD, 6, _data[id])
 	);
 }
 
@@ -140,8 +144,8 @@ void DO2(UINT id, BOOL out)
 	(
 		force_enabled,
 		id,
-		SET_BIT(DDRD, 7, out);_data[id] = out,
-		SET_BIT(DDRD, 7, _data[id])
+		SET_BIT(PORTD, 7, out);_data[id] = out,
+		SET_BIT(PORTD, 7, _data[id])
 	);
 }
 
@@ -151,8 +155,8 @@ void DO3(UINT id, BOOL out)
 	(
 		force_enabled,
 		id,
-		SET_BIT(DDRD, 8, out);_data[id] = out,
-		SET_BIT(DDRD, 8, _data[id])
+		SET_BIT(PORTB, 0, out);_data[id] = out,
+		SET_BIT(PORTB, 0, _data[id])
 	);
 }
 
@@ -162,8 +166,8 @@ void DO4(UINT id, BOOL out)
 	(
 		force_enabled,
 		id,
-		SET_BIT(DDRD, 9, out);_data[id] = out,
-		SET_BIT(DDRD, 9, _data[id])
+		SET_BIT(PORTB, 1, out);_data[id] = out,
+		SET_BIT(PORTB, 1, _data[id])
 	);
 }
 
