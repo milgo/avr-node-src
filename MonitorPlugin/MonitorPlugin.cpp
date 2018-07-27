@@ -32,6 +32,8 @@ MonitorPlugin()
         emit onConnectedToDevice();
         //sendRequestForChecksum();
     });
+
+    connected = false;
 }
 
 QObject*
@@ -97,7 +99,7 @@ replyHandler(QByteArray buffer, quint16 bytes_received)
         else
         {
           qDebug("Setting force disable on device");
-          disconnectFromDevice();
+          //disconnectFromDevice();
         }
         break;
     }
@@ -138,7 +140,7 @@ bool
 MonitorPlugin
 ::connectToDevice(QJsonObject connectionInfo)
 {
-    serialPort.setPortName(connectionInfo["comPort"].toString());
+    serialPort.setPortName(connectionInfo["port"].toString());
     serialPort.setBaudRate(QSerialPort::Baud19200);
 
     LOGV("connecting to device using port %1", connectionInfo["comPort"].toString());
@@ -146,9 +148,12 @@ MonitorPlugin
     {
         LOG("connection error");
         onErrorMessage("Connection failed.");
+        connected = false;
+        onConnectionFailed();
         return false;
     }
 
+    connected = true;
     LOG("device connected");
     emit onInfoMessage("Device connected...");
 
@@ -202,7 +207,7 @@ MonitorPlugin
     dataToSend.clear();
     writeData.clear();
     bytesWritten = 0;
-
+    connected = false;
     if (serialPort.isOpen())
     {
         serialPort.close();
@@ -218,7 +223,7 @@ bool
 MonitorPlugin
 ::isConnected()
 {
-    return serialPort.isOpen();
+    return serialPort.isOpen() && connected;
 }
 
 void

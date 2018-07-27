@@ -89,6 +89,9 @@ signals:
     onDisconnectedFromDevice();
 
     void
+    onConnectionFailed();
+
+    void
     dataReceived(QByteArray data);
 
     void
@@ -186,6 +189,7 @@ private:
     QByteArray writeData;
     qint64 bytesWritten = 0;
     quint8 requestCounter = 0;
+    bool connected;
 };
 
 #endif // MONITORPLUGIN_H
