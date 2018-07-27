@@ -34,6 +34,7 @@ void zero_data_forced(void);
 /*INPUT*/ UINT AI2(UINT id);
 
 /*OUTPUT*/ void AO1(UINT id, UINT out);
+/*OUTPUT*/ void AO2(UINT id, UINT out);
 
 /*FUNCTION*/ BOOL FLIP(UINT id, BOOL set, BOOL reset);
 /*FUNCTION*/ BOOL TMR(UINT id, UINT time, BOOL reset);

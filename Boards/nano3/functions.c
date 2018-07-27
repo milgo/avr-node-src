@@ -47,26 +47,33 @@ void setup()
     //DDRC and PORTC register is all zeros after reset HI-Z
     //Setting DDRC bit to one makes PORTC pin output sink
 
-    /* Setup AO outputs */
-    DDRB |= _BV(2);
-
-    /* Setup PWM - TIMER1 */
-    TCCR1A |= (1<<WGM10); // Fast PWM 8bit
-    TCCR1B |= (1<<WGM12);
-    TCCR1A |= (1<<COM1A1)|(1<<COM1B1); //Clear OC1A/OC1B on Compare Match, set OC1A/OC1B at BOTTOM
-    TCCR1B |= (1<<CS10)|(1<<CS11); // Preksaler = 64  fpwm = 976,5Hz
-    OCR1A = 0; // Channel A = 0
+    /* Setup PWM */
+	//OCR1A = 0; // Channel A = 0
     OCR1B = 0; // Channel B = 0
+	OCR2A = 0;
+
+    TCCR1A |= (1<<WGM10); // Fast PWM 8bit
+	TCCR1A |= (1<<COM1B1); //Clear OC1B on Compare Match, set OC1B at BOTTOM
+	TCCR1B |= (1<<WGM12);
+    TCCR1B |= (1<<CS10)|(1<<CS11); // Preksaler = 64  fpwm = 976,5Hz
+
+	TCCR2A |= (1<<WGM20); // Fast PWM 8bit
+	TCCR2A |= (1<<COM2A1); //Clear OC1B on Compare Match, set OC1B at BOTTOM
+    TCCR2B |= (1<<WGM21);
+    TCCR2B |= (1<<CS20)|(1<<CS21); // Preksaler = 64  fpwm = 976,5Hz
+
+	/* Setup AO outputs */
+    DDRB |= _BV(2) | _BV(3);
 
 	/* Setup DI inputs */
     DDRD &= ~_BV(2) & ~_BV(3) & ~_BV(4) & ~_BV(5);
 	/* Pull-up resistors */
     PORTD |= _BV(2) | _BV(3) | _BV(4) |_BV(5);
-	
+
 	/* Setup DO outputs */
 	DDRD |= _BV(6) | _BV(7); //Source current
 	DDRB |= _BV(0) | _BV(1);
-	
+
 	/* Setup ADC */
     DDRC &= ~_BV(0) & ~_BV(1);
     /* AVCC with external capacitor at AREF pin */
@@ -178,7 +185,6 @@ BOOL DI1(UINT id)
 		force_enabled,
 		id,
 		_data[id] = !GET_BIT(PIND, 2),
-		
 	);
 	return _data[id];
 }
@@ -227,7 +233,7 @@ UINT AI1(UINT id)
 		id,
 		_data[id] = adcResults[0],
 
-	);    
+	);
     return _data[id];
 }
 
@@ -239,7 +245,7 @@ UINT AI2(UINT id)
 		id,
 		_data[id] = adcResults[1],
 
-	);    
+	);
     return _data[id];
 }
 
@@ -247,15 +253,30 @@ void AO1(UINT id, UINT out)
 {
 	if(out<0)out=0;
 	if(out>255)out=255;
-	
+
 	FORCED_SELECTOR
 	(
 		force_enabled,
 		id,
 		_data[id] = out;
-		OCR1A = out,
-		OCR1A = _data[id]
-	);    
+		OCR1B = out,
+		OCR1B = _data[id]
+	);
+}
+
+void AO2(UINT id, UINT out)
+{
+	if(out<0)out=0;
+	if(out>255)out=255;
+
+	FORCED_SELECTOR
+	(
+		force_enabled,
+		id,
+		_data[id] = out;
+		OCR2A = out,
+		OCR2A = _data[id]
+	);
 }
 
 UINT UCONST(UINT cnst){

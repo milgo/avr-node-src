@@ -41,7 +41,7 @@
 
 
 # MCU name
-MCU = atmega8
+MCU = 
 
 
 # Processor frequency.
