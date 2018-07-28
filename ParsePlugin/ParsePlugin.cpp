@@ -4,6 +4,7 @@
 #include <QTextStream>
 #include <QJsonArray>
 #include <QDirIterator>
+#include <QJsonDocument>
 
 ParsePlugin::
 ParsePlugin()
@@ -38,70 +39,86 @@ parseFiles(QString path)
         QRegExp paramDefRegEx("\\w+ \\w+");
         while(!in.atEnd())
         {
-            QString line = in.readLine().trimmed();
-            if(line.startsWith("/*VARDEF*/"))
+            QString metaData = in.readLine().trimmed();
+
+            if(metaData.trimmed().startsWith("/*"))
             {
-                line = line.remove(0,11);
-                QStringList split = line.split(" ");
-                QJsonObject varJson;
-                varJson["type"] = split[1];
-                //emit this->onParseNewVariableType(varJson);
-                varTypes.append(varJson);
-            }
-            else if(line.startsWith("/*"))
-            {
-              QRegExp sep("(\\/\\*)|(\\*\\/)");
-              QStringList params = line.section(sep,1,1).split(",");
-              QString categoryName = params[0];
+                if(in.atEnd())break;
+                QString line2 = in.readLine().trimmed();
 
-              line = line.remove(0,line.indexOf("*\\")+2);
-              line = line.trimmed();
+                metaData = metaData.left(metaData.length()-2);
+                metaData = metaData.right(metaData.length()-2);
+                QJsonDocument jsonDoc = QJsonDocument::fromJson(metaData.toUtf8());
+                if(jsonDoc.isNull())
+                {
+                    onErrorMessage("Invalid variable/function metedata");
+                    break;
+                }
 
-              QJsonObject funcJson;
-              QJsonArray funcArgsJson;
+                QJsonObject metaJsonObj = jsonDoc.object();
+                //qDebug("category="+metaJsonObj["category"].toString().toUtf8());
 
-              int offset = 0;
-              int counter = 0;
+                if(metaJsonObj["category"].toString().toLower() == "vardef")
+                {
+                    QStringList split = line2.split(" ");
+                    QJsonObject varJson;
+                    varJson["type"] = split[1];
+                    varJson["regex"] = metaJsonObj["regex"].toString();
+                    varTypes.append(varJson);
+                }
+                else
+                {
+                    //QRegExp sep("(\\/\\*)|(\\*\\/)");
+                    //QStringList params = line.section(sep,1,1).split(",");
+                    QString categoryName = metaJsonObj["category"].toString().toUpper();
 
-              while ( (offset = paramDefRegEx.indexIn(line, offset)) != -1 )
-              {
-                  offset += paramDefRegEx.matchedLength();
+                    QJsonObject funcJson;
+                    QJsonArray funcArgsJson;
 
-                  QStringList split = paramDefRegEx.cap(0).split(QRegExp("\\s"));
+                    int offset = 0;
+                    int counter = 0;
 
-                  if(counter == 0)
-                  {
-                      funcJson["name"] = split[1].toUpper();;
-                      funcJson["returnType"] = split[0].toUpper();
-                      funcJson["category"] = categoryName;
-                      funcJson["isBoolType"] = QString("0");
-                      funcJson["isVoidType"] = QString("0");
-                      if(!funcJson["returnType"].toString().compare("BOOL"))
-                          funcJson["isBoolType"] = QString("1");
-                      if(!funcJson["returnType"].toString().compare("VOID"))
-                          funcJson["isVoidType"] = QString("1");
-                  }
-                  else if(counter == 1)
-                  {
+                    while ( (offset = paramDefRegEx.indexIn(line2, offset)) != -1 )
+                    {
+                        offset += paramDefRegEx.matchedLength();
 
-                  }
-                  else
-                  {
-                      QJsonObject arg;
-                      arg["name"] = split[1].toUpper();
-                      arg["type"] = split[0].toUpper();
-                      arg["value"] = QString("");
-                      funcArgsJson.append(arg);
-                  }
+                        QStringList split = paramDefRegEx.cap(0).split(QRegExp("\\s"));
 
-                  counter++;
-              }
+                        if(counter == 0)
+                        {
+                            funcJson["name"] = split[1].toUpper();;
+                            funcJson["returnType"] = split[0].toUpper();
+                            funcJson["category"] = categoryName;
+                            funcJson["isBoolType"] = QString("0");
+                            funcJson["isVoidType"] = QString("0");
+                            if(!funcJson["returnType"].toString().compare("BOOL"))
+                                funcJson["isBoolType"] = QString("1");
+                            if(!funcJson["returnType"].toString().compare("VOID"))
+                                funcJson["isVoidType"] = QString("1");
+                        }
+                        else if(counter == 1)
+                        {
 
-              funcJson["args"] = funcArgsJson;
+                        }
+                        else
+                        {
+                            QJsonObject arg;
+                            arg["name"] = split[1].toUpper();
+                            arg["type"] = split[0].toUpper();
+                            arg["value"] = QString("");
+                            funcArgsJson.append(arg);
+                        }
 
-              if(funcJson["name"].toString().length()>0)
-                  functions.append(funcJson);
-                //emit this->onParseNewFunctionBlock(funcJson);
+                        counter++;
+                    }
+
+                    funcJson["args"] = funcArgsJson;
+                    funcJson["regex"] = metaJsonObj["regex"].toString();
+
+                    if(funcJson["name"].toString().length()>0)
+                        functions.append(funcJson);
+                      //emit this->onParseNewFunctionBlock(funcJson);
+                }
             }
         }
 
