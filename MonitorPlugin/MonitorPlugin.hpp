@@ -89,7 +89,7 @@ signals:
     onDisconnectedFromDevice();
 
     void
-    onConnectionFailed();
+    onConnectionFailed() override;
 
     void
     dataReceived(QByteArray data);

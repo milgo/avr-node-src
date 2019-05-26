@@ -36,7 +36,8 @@ parseFiles(QString path)
     {
         QTextStream in(&file);
 
-        QRegExp paramDefRegEx("\\w+ \\w+");
+        //example: "int var1" or "int *var1"
+        QRegExp paramDefRegEx("(\\w+\\s+\\w+|\\w+\\s+\\*\\w+|\\w+\\s+\\*\\s+\\w+|\\w+\\*\\s+\\w+)");
         while(!in.atEnd())
         {
             QString metaData = in.readLine().trimmed();
@@ -74,6 +75,7 @@ parseFiles(QString path)
 
                     QJsonObject funcJson;
                     QJsonArray funcArgsJson;
+                    QJsonArray funcOutsJson;
 
                     int offset = 0;
                     int counter = 0;
@@ -102,17 +104,27 @@ parseFiles(QString path)
                         }
                         else
                         {
-                            QJsonObject arg;
-                            arg["name"] = split[1].toUpper();
-                            arg["type"] = split[0].toUpper();
-                            arg["value"] = QString("");
-                            funcArgsJson.append(arg);
+                            if(split[1].startsWith("*")){
+                                QJsonObject out;
+                                out["name"] = split[1].replace("*","").toUpper();
+                                out["type"] = split[0].toUpper();
+                                out["value"] = QString("");
+                                funcOutsJson.append(out);
+                            }
+                            else{
+                                QJsonObject arg;
+                                arg["name"] = split[1].toUpper();
+                                arg["type"] = split[0].toUpper();
+                                arg["value"] = QString("");
+                                funcArgsJson.append(arg);
+                            }
                         }
 
                         counter++;
                     }
 
                     funcJson["args"] = funcArgsJson;
+                    funcJson["outs"] = funcOutsJson;
                     funcJson["regex"] = metaJsonObj["regex"].toString();
 
                     if(funcJson["name"].toString().length()>0)
