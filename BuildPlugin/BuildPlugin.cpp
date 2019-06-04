@@ -29,7 +29,7 @@ build(QJsonObject config, QJsonObject deviceConfig)
 {
     QString workingDir = QCoreApplication::applicationDirPath() + "/" +  config["build_dir"].toString();
     QString buildCommand = config["build_command"].toString() + " BOARD_DIR=" + config["board_dir"].toString() +
-            " MCU=" + deviceConfig["mcu"].toString() + " F_CPU=" + deviceConfig["fcpu"].toString();
+            " MCU=" + deviceConfig["mcu"].toString() + " F_CPU=" + deviceConfig["fcpu"].toString() +" --debug";
     process.setWorkingDirectory(workingDir);
     onInfoMessage(workingDir);
     onInfoMessage(buildCommand);

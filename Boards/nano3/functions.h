@@ -8,7 +8,7 @@
 #include "setup.h"
 #include "max.h"
 
-volatile uint32_t _data[MAX_DATA];
+uint32_t _data[MAX_DATA];
 volatile uint8_t force_enabled;
 
 void set_data_forced(uint8_t id, uint8_t forced);
@@ -47,7 +47,7 @@ UINT AI1(UINT id);
 UINT AI2(UINT id);
 
 /*{"category":"output"}*/
-void AO1(UINT id, UINT out);
+BOOL AO1(UINT id, BOOL in, UINT out, UINT *error);
 /*{"category":"output"}*/
 void AO2(UINT id, UINT out);
 

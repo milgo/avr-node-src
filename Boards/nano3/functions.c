@@ -249,7 +249,7 @@ UINT AI2(UINT id)
     return _data[id];
 }
 
-void AO1(UINT id, UINT out)
+BOOL AO1(UINT id, BOOL in, UINT out, UINT* error)
 {
 	if(out<0)out=0;
 	if(out>255)out=255;
@@ -262,6 +262,8 @@ void AO1(UINT id, UINT out)
 		OCR1B = out,
 		OCR1B = _data[id]
 	);
+
+	return 0;
 }
 
 void AO2(UINT id, UINT out)

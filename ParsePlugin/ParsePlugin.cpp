@@ -159,6 +159,10 @@ bool
 ParsePlugin::
 compile(QJsonObject program, QString path)
 {
+    QJsonDocument doc(program);
+    QString strJson(doc.toJson(QJsonDocument::Indented));
+    qDebug(strJson.toUtf8());
+
     bool errors = false;
     QJsonArray variables = program["variables"].toArray();
     QJsonArray types = program["types"].toArray();
@@ -179,6 +183,7 @@ compile(QJsonObject program, QString path)
         QString typeName = value.toString();
         varDefineStream << typeName << " set" << typeName << "(uint32_t index, " << typeName << " value);" << endl;
         varDefineStream << typeName << " get" << typeName << "(uint32_t index);" << endl << endl;
+        varDefineStream << typeName << " *addr" << typeName << "(uint32_t index);" << endl << endl;
     }
 
     /* CHECKSUM DEFINITION STRING */
@@ -201,6 +206,8 @@ compile(QJsonObject program, QString path)
         QString typeName = value.toString();
         varDeclStream << typeName << " set" << typeName << "(uint32_t index, " << typeName << " value){_data[index]=value; return value;}" << endl;
         varDeclStream << typeName << " get" << typeName << "(uint32_t index){return _data[index];}" << endl;
+        //TODO:
+        varDeclStream << typeName << " *addr" << typeName << "(uint32_t index){" << typeName << " *ptr = _data; return (ptr+index);}" << endl;
     }
 
     /* MAIN PROGRAM STRING */
@@ -285,6 +292,9 @@ compileNode(QJsonArray program, QJsonArray variables, QJsonObject root)
     QJsonArray args = root["args"].toArray();
     int argsSize = args.count();
 
+    QJsonArray outs = root["outs"].toArray();
+    int outsSize = outs.count();
+
     QString result;
     if(!root["type"].toString().compare("VARIABLE"))
     {
@@ -345,7 +355,17 @@ compileNode(QJsonArray program, QJsonArray variables, QJsonObject root)
             }
         }
         argCounter++;
-        if(argCounter<argsSize)
+        if(argCounter<argsSize || outsSize > 0)
+            result.append(",");
+    }
+
+    int outCounter = 0;
+    foreach (const QJsonValue & out, outs)
+    {
+        QStringList split = out.toString().split(":");
+        result.append("addr"+split[1]+"("+split[0]+")");
+        outCounter++;
+        if(outCounter<outsSize)
             result.append(",");
     }
 
