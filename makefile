@@ -11,10 +11,10 @@
 #AVRDUDE_PORT= usb
 
 # Nazwa wynikowego pliku hex
-PROJECT = main
+TARGET = main
 
 # Pliki Ÿród³owe
-SOURCES = $(PROJECT).c $(BOARD_DIR)/functions.c program.c $(BOARD_DIR)/uart.c variables.c crc.c hdlc.c spi.c winbond.c
+SOURCES = $(TARGET).c $(BOARD_DIR)/functions.c program.c $(BOARD_DIR)/uart.c variables.c crc.c hdlc.c spi.c winbond.c
 
 CC = avr-gcc
 OBJCOPY = avr-objcopy
@@ -25,22 +25,24 @@ CFLAGS = $(CDEFS)
 CFLAGS += -mmcu=$(MCU) -g -Os -Wall
 
 OBJECTS = $(SOURCES:.c=.o)
+SIZE = avr-size
 
-$(PROJECT).hex: $(PROJECT).out
-	$(OBJCOPY) -O ihex -R .eeprom $(PROJECT).out $(PROJECT).hex
+$(TARGET).hex: $(TARGET).elf
+	$(OBJCOPY) -O ihex -R .eeprom $(TARGET).elf $(TARGET).hex
+	$(SIZE) --totals $(TARGET).elf
 
-$(PROJECT).out:  $(OBJECTS)
+$(TARGET).elf:  $(OBJECTS)
 	$(CC)  $(CFLAGS) $^ -o $@ -lm
 
 $.o:%.c
 	$(CC) $(CFLAGS) $< -o $@
 
-program_flash: $(PROJECT).hex
-	avrdude -c $(AVRDUDE_PROGRAMMER) -P $(AVRDUDE_PORT) -p $(MCU) -b $(AVRDUDE_BAUD) -U flash:w:$(PROJECT).hex 
+program_flash: $(TARGET).hex
+	avrdude -c $(AVRDUDE_PROGRAMMER) -P $(AVRDUDE_PORT) -p $(MCU) -b $(AVRDUDE_BAUD) -U flash:w:$(TARGET).hex 
 
 clean:
 	rm -f $(OBJECTS) 
-	rm -f $(PROJECT).out
-	rm -f $(PROJECT).hex
+	rm -f $(TARGET).elf
+	rm -f $(TARGET).hex
 
 .PHONY: clean program_flash

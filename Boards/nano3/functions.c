@@ -33,13 +33,13 @@ normal;\
 
 #define MAX_DATA_FORCED MAX_DATA/8+1
 	
-volatile UINT adcResults[ADC_CHANNELS];
-volatile UINT adcIsrChnl=0;
-volatile uint32_t _data[MAX_DATA];
-volatile uint8_t _data_forced[MAX_DATA_FORCED];
-volatile uint32_t time = 0;
-volatile uint32_t dtime = 0;
-volatile uint8_t force_enabled = 0;
+UINT adcResults[ADC_CHANNELS];
+UINT adcIsrChnl=0;
+uint32_t _data[MAX_DATA];
+uint8_t _data_forced[MAX_DATA_FORCED];
+uint32_t time = 0;
+uint32_t dtime = 0;
+uint8_t force_enabled = 0;
 
 void setup()
 {

@@ -2,6 +2,7 @@
 #include "setup.h"
 #include "crc32.h"
 #include "functions.h"
+#include "project.h"
 
 #define GetNodeValue 0x16
 #define GetProgramChecksum 0x17
@@ -13,6 +14,8 @@
 #define WriteDataToExternalFlash 0x22
 #define ReadDataFromExternalFlash 0x23
 #define EraseBlockFromExternalFlash 0x24
+
+const char project_data[] = PROJECT_DATA;
 
 static void tx_u8(uint8_t data)
 {

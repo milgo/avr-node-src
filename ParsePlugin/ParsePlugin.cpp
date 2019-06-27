@@ -157,7 +157,7 @@ parseFiles(QString path)
 
 bool
 ParsePlugin::
-compile(QJsonObject program, QString path)
+compile(QJsonObject project, QJsonObject program, QString path)
 {
     QJsonDocument doc(program);
     QString strJson(doc.toJson(QJsonDocument::Indented));
@@ -227,6 +227,22 @@ compile(QJsonObject program, QString path)
         }
     }
 
+    /* PROJECT DATA STRING */
+    QString projectString = "#define PROJECT_DATA {";
+    QByteArray compressedProject = qCompress(QJsonDocument(project).toJson(), 9);
+
+    for(int i=0; i<compressedProject.count(); i++){
+        QString hexadecimal;
+        char ch = compressedProject.at(i);
+        unsigned char uch = reinterpret_cast<unsigned char&>(ch);
+        hexadecimal.setNum(uch, 16);
+        projectString.append("0x").append(hexadecimal);
+        if(i<compressedProject.count()-1)
+            projectString.append(",");
+    }
+
+    projectString.append("}");
+
     /* FIND TEMPLATES AND INSERT STRINGS */
     QDirIterator it(path, QStringList() << "*.*_", QDir::Files, QDirIterator::Subdirectories);
     while (it.hasNext())
@@ -261,6 +277,9 @@ compile(QJsonObject program, QString path)
                     }
                     else if(line.trimmed() == "%DEFINE_VARIABLES%"){
                         outstream << varDefineString;
+                    }
+                    else if(line.trimmed() == "%DEFINE_PROJECT%"){
+                        outstream << projectString;
                     }
                     else{
                         outstream << line << endl;

@@ -27,13 +27,14 @@ bool
 DownloadPlugin::
 download(QJsonObject config, QJsonObject deviceConfig)
 {
-    QString workingDir = QCoreApplication::applicationDirPath() + "/" + config["build_dir"].toString();;
+    QString workingDir = QCoreApplication::applicationDirPath() + "/" + config["build_dir"].toString();
     //QString fileName = downloadInfo["file_name"].toString();
     //QString comPort = downloadInfo["com_port"].toString();
     process.setWorkingDirectory(workingDir);
     //process.start(downloadInfo["download_command"].toString());
-    process.start("make program AVRDUDE_PORT=" + deviceConfig["port"].toString() + " AVRDUDE_PROGRAMMER=" +
-            deviceConfig["programmer"].toString() + " AVRDUDE_BAUD=" + deviceConfig["baudrate"].toString() + " MCU=" + deviceConfig["mcu"].toString()); // add comport
+    process.start("make program_flash AVRDUDE_PORT=" + deviceConfig["port"].toString() + " AVRDUDE_PROGRAMMER=" +
+            deviceConfig["programmer"].toString() + " AVRDUDE_BAUD=" + deviceConfig["baudrate"].toString() + " MCU=" + deviceConfig["mcu"].toString() +
+            " BOARD_DIR=" + config["board_dir"].toString()); // add comport
     //process.start("avrdude -c arduino -p m8 -P "+comPort.toLatin1()+" -b 115200 -U flash:w:\""+fileName.toLatin1()+"\":a");
     errors = false;
     return true;

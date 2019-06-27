@@ -1,0 +1,6 @@
+#ifndef _PROJECT_H_
+#define _PROJECT_H_
+
+%DEFINE_PROJECT%
+
+#endif
