@@ -99,7 +99,7 @@ replyHandler(QByteArray buffer, quint16 bytes_received)
         else
         {
           qDebug("Setting force disable on device");
-          //disconnectFromDevice();
+          disconnectFromDevice();
         }
         break;
     }

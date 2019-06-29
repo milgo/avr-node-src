@@ -1,6 +1,6 @@
 {
     "baudrate": "115200",
-    "port": "COM4",
+    "port": "COM6",
     "programmer": "arduino",
     "fcpu": "16000000",
     "mcu": "atmega328p",

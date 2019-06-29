@@ -231,6 +231,17 @@ compile(QJsonObject project, QJsonObject program, QString path)
     QString projectString = "#define PROJECT_DATA {";
     QByteArray compressedProject = qCompress(QJsonDocument(project).toJson(), 9);
 
+    QByteArray compressedDataSize;
+    quint32 dataSize = compressedProject.size();
+    for(int i = 0; i != sizeof(dataSize); ++i){
+        QString hexadecimal;
+        char ch = ((dataSize & (0xFF << (i*8))) >> (i*8));
+        unsigned char uch = reinterpret_cast<unsigned char&>(ch);
+        hexadecimal.setNum(uch, 16);
+        projectString.append("0x").append(hexadecimal);
+        projectString.append(", ");
+    }
+
     for(int i=0; i<compressedProject.count(); i++){
         QString hexadecimal;
         char ch = compressedProject.at(i);
@@ -238,7 +249,7 @@ compile(QJsonObject project, QJsonObject program, QString path)
         hexadecimal.setNum(uch, 16);
         projectString.append("0x").append(hexadecimal);
         if(i<compressedProject.count()-1)
-            projectString.append(",");
+            projectString.append(", ");
     }
 
     projectString.append("}");

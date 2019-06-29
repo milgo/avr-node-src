@@ -28,12 +28,15 @@ uploadProject()
     emit onInfoMessage("uploading...");
 
     //Read project size from external flash
-    uploadData(0x7F0000, 4);
+    //uploadData(0x7F0000, 4);
+    uploadData(0x00, 4);
+
     *uploadCompleteLambda = QObject::connect(this, &UploadPlugin::onUploadDataComplete, [&](QByteArray data)
     {
         quint32 dataSize = data.at(3) << 24 | data.at(2) << 16 | data.at(1) << 8 | data.at(0);
         qDebug(QString::number(dataSize,16).toUtf8());
-        uploadData(0x7F0004, dataSize);
+        //uploadData(0x7F0004, dataSize);
+        uploadData(0x04, dataSize);
         QObject::disconnect(*uploadCompleteLambda);
         *uploadCompleteLambda = QObject::connect(this, &UploadPlugin::onUploadDataComplete, [&](QByteArray data){
             QByteArray uncompressedData = qUncompress(data);
@@ -113,7 +116,7 @@ void
 UploadPlugin::
 onDataReadFromExternalFlash(quint32 addr, quint8 byte)
 {
-    qDebug(QString("Data %2 read from @%1")
+    qDebug(QString("Data %2 read from %1")
            .arg(QString::number(addr,16))
            .arg(QString::number(byte,16))
            .toUtf8());
@@ -139,12 +142,14 @@ uploadData(quint32 address, quint32 length)
     uploadSize = length;
     uploadIndex = 0;
 
-    if(address >= 0x7F0000)
+    readDataFromExternalFlash(address);
+
+    /*if(address >= 0x7F0000)
     {
         emit readDataFromExternalFlash(address);
     }
     else if(address < 0x7F0000)
     {
         emit onUploadProjectFail();
-    }
+    }*/
 }

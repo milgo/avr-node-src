@@ -73,14 +73,14 @@ void hdlc_on_rx_frame(const u8_t * data, size_t nr_of_bytes)
 			reply.data = _data[request->param];
 			break;
 		case WriteDataToExternalFlash:
-			addr = (request->data >> 8);
-			byte = (request->data & 0xFF);
-			reply.data = (addr << 8) | byte;
-			w25_write_byte(addr, byte);
+			//addr = (request->data >> 8);
+			//byte = (request->data & 0xFF);
+			//reply.data = (addr << 8) | byte;
+			//w25_write_byte(addr, byte);
 			break;
 		case ReadDataFromExternalFlash:
 			addr = request->data;
-			byte = w25_read_byte(addr);
+			byte = project_data[addr]; //w25_read_byte(addr);
 			reply.data = (addr << 8) | byte;
 			break;
 		case EraseBlockFromExternalFlash:
