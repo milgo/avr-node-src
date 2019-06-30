@@ -41,21 +41,21 @@ build(QJsonObject config, QJsonObject deviceConfig)
 void BuildPlugin::readStdout()
 {
     QString stdoutstr(process.readAllStandardOutput());
-    QStringList stdoutlist = stdoutstr.split(QRegExp("[\r\n]"),QString::SkipEmptyParts);
-    for(int i=0;i<stdoutlist.length();i++){
-        onInfoMessage(stdoutlist[i]);
-    }
+    //QStringList stdoutlist = stdoutstr.split(QRegExp("[\r\n]"),QString::SkipEmptyParts);
+    //for(int i=0;i<stdoutlist.length();i++){
+        onInfoMessage(stdoutstr/*stdoutlist[i]*/);
+    //}
 }
 
 
 void BuildPlugin::readStderr()
 {
     QString stderrstr (process.readAllStandardError());
-    QStringList stderrlist = stderrstr.split(QRegExp("[\r\n]"),QString::SkipEmptyParts);
-    for(int i=0;i<stderrlist.length();i++){
-        onErrorMessage(stderrlist[i]);
+    //QStringList stderrlist = stderrstr.split(QRegExp("[\r\n]"),QString::SkipEmptyParts);
+    //for(int i=0;i<stderrlist.length();i++){
+        onErrorMessage(stderrstr/*stderrlist[i]*/);
         errors = true;
-    }
+    //}
 }
 
 
