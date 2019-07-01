@@ -147,7 +147,7 @@ MonitorPlugin
     if (!serialPort.open(QIODevice::ReadWrite))
     {
         LOG("connection error");
-        onErrorMessage("Connection failed.");
+        onErrorMessage("Connection failed.\n");
         connected = false;
         onConnectionFailed();
         return false;
@@ -155,7 +155,7 @@ MonitorPlugin
 
     connected = true;
     LOG("device connected");
-    emit onInfoMessage("Device connected...");
+    emit onInfoMessage("Device connected...\n");
 
     startWriteTimer.start(5000);
     return true;
@@ -212,7 +212,7 @@ MonitorPlugin
     {
         serialPort.close();
         LOG("device disconnected");
-        emit onInfoMessage("Device disconnected...");
+        emit onInfoMessage("Device disconnected...\n");
         emit onDisconnectedFromDevice();
         return true;
     }    
@@ -245,11 +245,11 @@ MonitorPlugin
     const qint64 bytesWritten = serialPort.write(writeData);
 
     if (bytesWritten == -1) {
-        emit onErrorMessage(QObject::tr("Failed to write all the data to port %1, error: %2")
+        emit onErrorMessage(QObject::tr("Failed to write all the data to port %1, error: %2\n")
                              .arg(serialPort.portName())
                              .arg(serialPort.errorString()));
     } else if (bytesWritten != writeData.size()) {
-        emit onErrorMessage(QObject::tr("Failed to write all the data to port %1, error: %2")
+        emit onErrorMessage(QObject::tr("Failed to write all the data to port %1, error: %2\n")
                              .arg(serialPort.portName())
                              .arg(serialPort.errorString()));
     }
@@ -276,7 +276,7 @@ MonitorPlugin
 ::handleWriteTimeout()
 {
     LOG("write to device timeout");
-    emit onErrorMessage(QObject::tr("Operation timed out for port %1, error: %2")
+    emit onErrorMessage(QObject::tr("Operation timed out for port %1, error: %2\n")
                          .arg(serialPort.portName())
                          .arg(serialPort.errorString()));
 }
@@ -305,13 +305,13 @@ MonitorPlugin
     LOGV("serial port error occured: %1", serialPortError);
     if (serialPortError == QSerialPort::WriteError)
     {
-        emit onErrorMessage(QObject::tr("An I/O error occurred while writing the data to port %1, error: %2")
+        emit onErrorMessage(QObject::tr("An I/O error occurred while writing the data to port %1, error: %2\n")
                             .arg(serialPort.portName())
                             .arg(serialPort.errorString()));
     }
     else if (serialPortError == QSerialPort::ReadError)
     {
-        emit onErrorMessage(QObject::tr("An I/O error occurred while reading the data from port %1, error: %2")
+        emit onErrorMessage(QObject::tr("An I/O error occurred while reading the data from port %1, error: %2\n")
                             .arg(serialPort.portName())
                             .arg(serialPort.errorString()));
     }
