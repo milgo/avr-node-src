@@ -25,23 +25,6 @@ getObject ()
 
 bool
 BuildPlugin::
-verifyDeviceConfig(QJsonObject deviceConfig, QString version){
-    if(deviceConfig.contains("baudrate") &&
-            deviceConfig.contains("port") &&
-            deviceConfig.contains("programmer") &&
-            deviceConfig.contains("fcpu") &&
-            deviceConfig.contains("mcu") &&
-            deviceConfig.contains("parse_files") &&
-            deviceConfig.contains("version"))
-    {
-        if(!deviceConfig["version"].toString().compare(version))
-            return true;
-    }
-    return false;
-}
-
-bool
-BuildPlugin::
 build(QJsonObject config, QJsonObject deviceConfig)
 {
     QString workingDir = QCoreApplication::applicationDirPath() + "/" +  config["build_dir"].toString();

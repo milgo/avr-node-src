@@ -21,7 +21,6 @@ public:
     QObject* getObject() override;
 
     bool build(QJsonObject config, QJsonObject deviceConfig) override;
-    bool verifyDeviceConfig(QJsonObject config, QString version) override;
 
 public slots:
 
