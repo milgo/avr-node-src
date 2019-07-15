@@ -159,7 +159,7 @@ bool
 ParsePlugin::
 compile(QJsonObject project, QJsonObject program, QString path)
 {
-    QJsonDocument doc(program);
+    QJsonDocument doc(project);
     QString strJson(doc.toJson(QJsonDocument::Indented));
     qDebug(strJson.toUtf8());
 

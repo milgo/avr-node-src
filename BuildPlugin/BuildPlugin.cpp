@@ -28,12 +28,14 @@ BuildPlugin::
 build(QJsonObject config, QJsonObject deviceConfig)
 {
     QString workingDir = QCoreApplication::applicationDirPath() + "/" +  config["build_dir"].toString();
-    QString buildCommand = config["build_command"].toString() + " BOARD_DIR=" + config["board_dir"].toString() +
+    QString clearCommand = config["build_command"].toString() + " clean BOARD_DIR=" + config["boards_dir"].toString() +"/"+ deviceConfig["board_name"].toString();
+    QString buildCommand = config["build_command"].toString() + " BOARD_DIR=" + config["boards_dir"].toString() +"/"+ deviceConfig["board_name"].toString() +
             " MCU=" + deviceConfig["mcu"].toString() + " F_CPU=" + deviceConfig["fcpu"].toString() +" --debug";
+    QString fullCommand = "cmd /c \"" + clearCommand + " & " + buildCommand +"\"";
     process.setWorkingDirectory(workingDir);
-    onInfoMessage(workingDir);
-    onInfoMessage(buildCommand);
-    process.start(buildCommand);
+    onInfoMessage(workingDir + "\n");
+    onInfoMessage(fullCommand + "\n");
+    process.start(fullCommand);
     errors = false;
     return true;
 }

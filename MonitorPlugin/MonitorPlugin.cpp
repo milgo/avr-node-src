@@ -143,7 +143,7 @@ MonitorPlugin
     serialPort.setPortName(connectionInfo["port"].toString());
     serialPort.setBaudRate(QSerialPort::Baud19200);
 
-    LOGV("connecting to device using port %1", connectionInfo["comPort"].toString());
+    LOGV("connecting to device using port %1", connectionInfo["port"].toString());
     if (!serialPort.open(QIODevice::ReadWrite))
     {
         LOG("connection error");

@@ -4,5 +4,7 @@
     "programmer": "arduino",
     "fcpu": "16000000",
     "mcu": "atmega8",
-    "parse_files": "functions.h"
+    "parse_files": "functions.h",
+    "version": "1.0",
+    "board_name": "avt1622"
 }

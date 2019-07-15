@@ -41,8 +41,8 @@ program_flash: $(TARGET).hex
 	avrdude -c $(AVRDUDE_PROGRAMMER) -P $(AVRDUDE_PORT) -p $(MCU) -b $(AVRDUDE_BAUD) -U flash:w:$(TARGET).hex 
 
 clean:
-	rm -f $(OBJECTS) 
-	rm -f $(TARGET).elf
-	rm -f $(TARGET).hex
+	del *.o 
+	del /f $(TARGET).elf
+	del /f $(TARGET).hex
 
 .PHONY: clean program_flash
